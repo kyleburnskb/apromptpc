@@ -5,7 +5,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Atlanta, GA, IT Consultants | A Prompt PC</title>
   <meta name="description" content="We do IT & AI right. Atlanta-based IT consulting for cybersecurity, budget restructuring, AI implementation, mergers & acquisitions support."/>
+  
+  <!-- Open Graph / Social Media Meta Tags -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://apromptpc.com/" />
+  <meta property="og:title" content="Atlanta IT Consultants - We do IT & AI right | A Prompt PC" />
+  <meta property="og:description" content="Save up to $250k/year on your IT budget. Atlanta-based IT consulting for cybersecurity, budget restructuring, AI implementation. Only pay 25% of what we save you." />
+  <meta property="og:site_name" content="A Prompt PC" />
+  
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Atlanta IT Consultants - We do IT & AI right | A Prompt PC" />
+  <meta name="twitter:description" content="Save up to $250k/year on your IT budget. Only pay 25% of what we save you." />
+  
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" />
+  
+  <!-- Local Business Schema Markup -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "A Prompt PC",
+    "description": "Atlanta-based IT consulting for cybersecurity, budget restructuring, AI implementation, mergers & acquisitions support",
+    "url": "https://apromptpc.com",
+    "telephone": "+1-706-877-3724",
+    "email": "Kyle.Burns@apromptpc.com",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Atlanta",
+      "addressRegion": "GA",
+      "addressCountry": "US"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": "33.7490",
+      "longitude": "-84.3880"
+    },
+    "priceRange": "$$",
+    "areaServed": {
+      "@type": "State",
+      "name": "Georgia"
+    },
+    "serviceType": [
+      "IT Consulting",
+      "Cybersecurity",
+      "AI Implementation",
+      "Budget Restructuring",
+      "Mergers and Acquisitions IT Support"
+    ]
+  }
+  </script>
   <style>
     :root {
       --bg: #0a0f1a;
@@ -23,9 +73,71 @@
       background: radial-gradient(circle at 20% 30%, #0f172a 0%, var(--bg) 70%);
       color: var(--text);
       line-height: 1.6;
+      scroll-behavior: smooth;
+    }
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10, 15, 26, 0.95);
+      backdrop-filter: blur(12px);
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(96,165,250,0.15);
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, var(--accent), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    nav ul {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+      font-size: 1.1rem;
+    }
+    nav a:hover {
+      color: var(--accent);
+    }
+    .nav-cta {
+      background: var(--green);
+      color: black;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-weight: 700;
+    }
+    .nav-cta:hover {
+      background: #1ea54a;
+      color: black;
+    }
+    @media (max-width: 768px) {
+      nav {
+        flex-direction: column;
+        gap: 20px;
+        padding: 15px 20px;
+      }
+      nav ul {
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+      }
     }
     header {
-      padding: 160px 20px 120px;
+      padding: 160px 20px 60px;
       text-align: center;
       background: linear-gradient(to bottom, rgba(34,197,94,0.08), transparent);
     }
@@ -36,7 +148,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 24px;
-      line-height: 1.05;
+      line-height: 1.2;
       text-shadow: 0 5px 20px rgba(168,85,247,0.4);
     }
     .location {
@@ -64,6 +176,50 @@
       padding: 100px 20px;
       text-align: center;
       background: rgba(0,0,0,0.4);
+    }
+    .pricing-section {
+      padding: 100px 20px;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(96,165,250,0.15));
+      border-top: 2px solid rgba(34,197,94,0.3);
+      border-bottom: 2px solid rgba(34,197,94,0.3);
+    }
+    .pricing-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(34,197,94,0.4);
+      border: 2px solid rgba(34,197,94,0.5);
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 60px 50px;
+      transition: all 0.4s;
+    }
+    .pricing-card:hover {
+      transform: translateY(-12px);
+      box-shadow: 0 30px 80px rgba(34,197,94,0.6);
+    }
+    .pricing-tagline {
+      font-size: 2.2rem;
+      color: var(--green);
+      font-weight: 800;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .pricing-highlight {
+      font-size: 4.5rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, var(--green), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 24px;
+      line-height: 1.1;
+    }
+    .pricing-subtitle {
+      font-size: 1.8rem;
+      color: #cbd5e1;
+      margin-bottom: 16px;
     }
     .values-title {
       font-size: 4rem;
@@ -107,7 +263,7 @@
       margin-bottom: 20px;
     }
     .services-section, .savings-section {
-      padding: 120px 20px;
+      padding: 80px 20px 120px;
       text-align: center;
     }
     h2 {
@@ -257,13 +413,33 @@
 </head>
 <body>
 
+  <nav>
+    <div class="logo">A Prompt PC</div>
+    <ul>
+      <li><a href="#savings">Solutions</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="tel:7068773724" class="nav-cta">Book a Call</a></li>
+    </ul>
+  </nav>
+
   <header>
     <h1>We do IT & AI right.</h1>
     <p class="location">Atlanta, GA, IT Consultants</p>
     <a href="tel:7068773724" class="cta-btn">Book a Call</a>
   </header>
 
-  <section class="savings-section">
+  <section class="pricing-section" id="pricing">
+    <div class="pricing-card">
+      <p class="pricing-tagline">Performance-Based Pricing</p>
+      <h2 class="pricing-highlight">You Only Pay 25% of What We Save You</h2>
+      <p class="pricing-subtitle">No savings? No fee. It's that simple.</p>
+      <p class="pricing-subtitle">Our incentives are 100% aligned with your success.</p>
+    </div>
+  </section>
+
+  <section class="savings-section" id="savings">
     <h2>Maximize Your Savings</h2>
     <p style="text-align:center; font-size:1.6rem; color:#94a3b8; margin-bottom:20px;">
       Eliminate Wasteful Redundancy. Strengthen Strategic Resilience.
@@ -380,7 +556,7 @@
     </div>
   </section>
 
-  <section class="services-section">
+  <section class="services-section" id="services">
     <h2>Services</h2>
     <div class="services-underline"></div>
 
@@ -390,12 +566,24 @@
           <i class="fas fa-shield-halved"></i>
           <div class="card-title">Cybersecurity</div>
         </div>
+        <div class="card-body">
+          <ul>
+            <li>Zero-trust architecture that actually works</li>
+            <li>Compliance without the compliance headache</li>
+          </ul>
+        </div>
       </div>
 
       <div class="card">
         <div class="card-header" style="background: linear-gradient(135deg, #f97316, #c2410c);">
           <i class="fas fa-dollar-sign"></i>
           <div class="card-title">Budget Restructuring</div>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li>Turn IT from cost center to profit multiplier</li>
+            <li>Cut waste. Amplify impact.</li>
+          </ul>
         </div>
       </div>
 
@@ -404,6 +592,12 @@
           <i class="fas fa-brain"></i>
           <div class="card-title">AI Implementation & IT Strategy</div>
         </div>
+        <div class="card-body">
+          <ul>
+            <li>AI that delivers ROI, not just hype</li>
+            <li>Strategic roadmaps that align tech with growth</li>
+          </ul>
+        </div>
       </div>
 
       <div class="card">
@@ -411,28 +605,34 @@
           <i class="fas fa-handshake"></i>
           <div class="card-title">Mergers and Acquisitions</div>
         </div>
+        <div class="card-body">
+          <ul>
+            <li>Seamless tech integration during M&A transitions</li>
+            <li>Due diligence that uncovers hidden IT risks</li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="values-section">
+  <section class="values-section" id="about">
     <h2 class="values-title">Save money!</h2>
     <div class="underline"></div>
 
     <div class="values-grid">
       <div class="value-card">
         <h3>Our Experience</h3>
-        <p>Kyle Burns and Team come prepared with more than 35 combined years in the IT industry. We have worked for and been the clients of multiple MSP’s. We have also created and maintained IT departments for multiple small to medium sized businesses. We are proficient in developing IT/security handbooks, SOPs, best practices, and streamlined onboarding/offboarding processes.</p>
+        <p>Kyle Burns and Team come prepared with more than 35 combined years in the IT industry. We have worked for and been the clients of multiple MSP's. We have also created and maintained IT departments for multiple small to medium sized businesses. We are proficient in developing IT/security handbooks, SOPs, best practices, and streamlined onboarding/offboarding processes.</p>
       </div>
 
       <div class="value-card">
         <h3>High ROI</h3>
-        <p>We have successfully rolled out our corporate restructuring for IT budgets to save $200,000 a year within three months. We have also achieved a quarter of a million dollars a year in IT savings within six months.</p>
+        <p>We have successfully rolled out our corporate restructuring for IT budgets to save $200,000 a year within three months for a 100-person company. We have also achieved a quarter of a million dollars a year in IT savings within six months for a 40-person company.</p>
       </div>
 
       <div class="value-card">
         <h3>Satisfaction Guaranteed</h3>
-        <p>We are compensated directly by the value we bring to your organization. Our Pricing model is 25% of what we save your company’s IT budget.</p>
+        <p>We are compensated directly by the value we bring to your organization. Our Pricing model is 25% of what we save your company's IT budget.</p>
       </div>
     </div>
   </section>
