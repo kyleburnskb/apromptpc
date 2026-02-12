@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Atlanta, GA, IT Consultants | A Prompt PC</title>
+  <meta name="description" content="We do IT & AI right. Atlanta-based IT consulting for cybersecurity, budget restructuring, AI implementation, mergers & acquisitions support."/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    :root {
+      --bg: #0a0f1a;
+      --card-bg: rgba(17, 24, 39, 0.85);
+      --text: #e2e8f0;
+      --accent: #60a5fa;
+      --purple: #a855f7;
+      --green: #22c55e;
+      --glow: rgba(96, 165, 250, 0.35);
+      --shadow: 0 15px 40px rgba(0,0,0,0.7);
+    }
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: radial-gradient(circle at 20% 30%, #0f172a 0%, var(--bg) 70%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      padding: 160px 20px 120px;
+      text-align: center;
+      background: linear-gradient(to bottom, rgba(34,197,94,0.08), transparent);
+    }
+    h1 {
+      font-size: 5rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, var(--accent), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 24px;
+      line-height: 1.05;
+      text-shadow: 0 5px 20px rgba(168,85,247,0.4);
+    }
+    .location {
+      font-size: 1.8rem;
+      color: #94a3b8;
+      margin-bottom: 40px;
+    }
+    .cta-btn {
+      display: inline-block;
+      padding: 20px 50px;
+      background: var(--green);
+      color: black;
+      font-size: 1.6rem;
+      font-weight: 700;
+      border-radius: 12px;
+      text-decoration: none;
+      box-shadow: 0 10px 30px rgba(34,197,94,0.5);
+      transition: all 0.4s;
+    }
+    .cta-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 20px 50px rgba(34,197,94,0.7);
+    }
+    .values-section {
+      padding: 100px 20px;
+      text-align: center;
+      background: rgba(0,0,0,0.4);
+    }
+    .values-title {
+      font-size: 4rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, var(--accent), var(--green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 40px;
+    }
+    .underline {
+      height: 8px;
+      width: 400px;
+      background: linear-gradient(to right, var(--green), transparent);
+      margin: 0 auto 80px;
+    }
+    .values-grid {
+      display: flex;
+      justify-content: center;
+      gap: 50px;
+      flex-wrap: wrap;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .value-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      padding: 48px;
+      border-radius: 24px;
+      width: 380px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(96,165,250,0.2);
+      transition: all 0.4s;
+    }
+    .value-card:hover {
+      transform: translateY(-12px);
+      box-shadow: 0 30px 70px rgba(0,0,0,0.8), 0 0 50px var(--glow);
+    }
+    .value-card h3 {
+      font-size: 2rem;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+    .services-section, .savings-section {
+      padding: 120px 20px;
+      text-align: center;
+    }
+    h2 {
+      font-size: 3.8rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, var(--accent), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 60px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 40px;
+      max-width: 1600px;
+      margin: 0 auto;
+      justify-content: center;
+    }
+    @media (min-width: 1024px) {
+      .grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      border: 1px solid rgba(96,165,250,0.25);
+      transform-style: preserve-3d;
+      perspective: 1000px;
+      max-width: 420px;
+    }
+    .card:hover {
+      transform: translateY(-28px) rotateX(6deg) rotateY(6deg) scale(1.04);
+      box-shadow: 0 50px 100px rgba(0,0,0,0.9), 0 0 80px var(--glow);
+      border-color: rgba(96,165,250,0.6);
+    }
+    .card-header {
+      padding: 70px 32px 40px;
+      text-align: center;
+      position: relative;
+      min-height: 200px;
+    }
+    .card-header i {
+      font-size: 5.2rem;
+      color: white;
+      opacity: 0.98;
+      background: linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.06));
+      width: 140px;
+      height: 140px;
+      line-height: 140px;
+      border-radius: 50%;
+      position: absolute;
+      top: -70px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.8), inset 0 6px 20px rgba(255,255,255,0.25);
+      transition: all 0.45s ease;
+      filter: drop-shadow(0 12px 32px rgba(0,0,0,0.7));
+    }
+    .card:hover .card-header i {
+      transform: translateX(-50%) scale(1.18) rotate(12deg);
+    }
+    .card-title {
+      font-size: 2rem;
+      font-weight: 900;
+      margin: 30px 0 0;
+      color: white;
+      text-shadow: 0 3px 12px rgba(0,0,0,0.6);
+    }
+    .card-body {
+      padding: 0 36px 48px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 24px 0 0;
+    }
+    li {
+      margin-bottom: 18px;
+      font-size: 1.2rem;
+      padding-left: 40px;
+      position: relative;
+      color: #cbd5e1;
+    }
+    li::before {
+      content: "\f058";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      color: var(--green);
+      position: absolute;
+      left: 0;
+      font-size: 1.6rem;
+      top: 0;
+      text-shadow: 0 0 12px rgba(52,211,153,0.7);
+    }
+    .contact-section {
+      padding: 120px 20px;
+      text-align: center;
+      background: linear-gradient(to bottom, rgba(34,197,94,0.08), transparent);
+    }
+    .contact-title {
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: white;
+      margin-bottom: 32px;
+    }
+    .contact-text {
+      font-size: 1.8rem;
+      margin-bottom: 40px;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    footer {
+      text-align: center;
+      padding: 80px 20px 40px;
+      color: #94a3b8;
+      font-size: 1.1rem;
+      border-top: 1px solid rgba(96,165,250,0.15);
+    }
+    @media (max-width: 1023px) {
+      .grid { grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+    }
+    @media (max-width: 768px) {
+      h1 { font-size: 3.2rem; }
+      .cta-btn { font-size: 1.4rem; padding: 16px 40px; }
+      .values-grid { flex-direction: column; align-items: center; }
+      .value-card { width: 100%; max-width: 500px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>We do IT & AI right.</h1>
+    <p class="location">Atlanta, GA, IT Consultants</p>
+    <a href="tel:7068773724" class="cta-btn">Book a Call</a>
+  </header>
+
+  <section class="values-section">
+    <h2 class="values-title">Save money!</h2>
+    <div class="underline"></div>
+
+    <div class="values-grid">
+      <div class="value-card">
+        <h3>Our Experience</h3>
+        <p>Kyle Burns and Team come prepared with more than 35 combined years in the IT industry. We have worked for and been the clients of multiple MSP’s. We have also created and maintained IT departments for multiple small to medium sized businesses. We are proficient in developing IT/security handbooks, SOPs, best practices, and streamlined onboarding/offboarding processes.</p>
+      </div>
+
+      <div class="value-card">
+        <h3>High ROI</h3>
+        <p>We have successfully rolled out our corporate restructuring for IT budgets to save $200,000 a year within three months. We have also achieved a quarter of a million dollars a year in IT savings within six months.</p>
+      </div>
+
+      <div class="value-card">
+        <h3>Satisfaction Guaranteed</h3>
+        <p>We are compensated directly by the value we bring to your organization. Our Pricing model is 25% of what we save your company’s IT budget.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="services-section">
+    <h2>Services</h2>
+    <div class="services-underline"></div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-header" style="background: linear-gradient(135deg, #22c55e, #15803d);">
+          <i class="fas fa-shield-halved"></i>
+          <div class="card-title">Cybersecurity</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="background: linear-gradient(135deg, #f97316, #c2410c);">
+          <i class="fas fa-dollar-sign"></i>
+          <div class="card-title">Budget Restructuring</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="background: linear-gradient(135deg, #ec4899, #be185d);">
+          <i class="fas fa-brain"></i>
+          <div class="card-title">AI Implementation & IT Strategy</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+          <i class="fas fa-handshake"></i>
+          <div class="card-title">Mergers and Acquisitions</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="savings-section">
+    <h2>Maximize Your Savings</h2>
+    <p style="text-align:center; font-size:1.6rem; color:#94a3b8; margin-bottom:20px;">
+      Eliminate Wasteful Redundancy. Strengthen Strategic Resilience.
+    </p>
+    <p style="text-align:center; font-size:1.6rem; color:#94a3b8; margin-bottom:80px;">
+      Optimize Your IT Budget • Real Results, No Fluff
+    </p>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-header" style="background: linear-gradient(135deg, #0ea5e9, #0284c7);">
+          <i class="fas fa-cogs"></i>
+          <div class="card-title">MSP</div>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li>Consolidate overlapping tools & vendors for hyper-efficient operations</li>
+            <li>Accelerate removal of antiquated systems & legacy tech debt</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+          <i class="fas fa-layer-group"></i>
+          <div class="card-title">Enterprise Stack</div>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li>Consolidate licensing & streamline Microsoft ecosystem (SharePoint, Power BI, Automate, Planner, Forms)</li>
+            <li>Upgrade to cutting-edge versions for volume discounts & productivity multipliers</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="background: linear-gradient(135deg, #22c55e, #15803d);">
+          <i class="fas fa-shield-halved"></i>
+          <div class="card-title">Cybersecurity</div>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li>Fortify zero-trust defenses against phishing & social engineering</li>
+            <li>Secure email, domain/web hosting & compliance in one unified layer</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="background: linear-gradient(135deg, #f97316, #c2410c);">
+          <i class="fas fa-phone-volume"></i>
+          <div class="card-title">Unified Communications</div>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li>Transition legacy to modern AI-powered UCaaS / VoIP</li>
+            <li>Enable seamless AI-enhanced routing & omnichannel collaboration</li>
+            <li>Eliminate redundant analog/legacy lines for massive cost cuts</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="background: linear-gradient(135deg, #a855f7, #7e22ce);">
+          <i class="fas fa-cloud"></i>
+          <div class="card-title">SaaS</div>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li>Audit & ruthlessly eliminate shadow SaaS / unused subscriptions</li>
+            <li>Defragment tools into streamlined, cost-optimized stacks</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="background: linear-gradient(135deg, #475569, #1e293b);">
+          <i class="fas fa-server"></i>
+          <div class="card-title">Server Infrastructure</div>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li>Optimize resources & performance via virtualization & auto-scaling</li>
+            <li>Slash legacy hardware costs through smart cloud migration</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="background: linear-gradient(135deg, #ec4899, #be185d);">
+          <i class="fas fa-brain"></i>
+          <div class="card-title">AI Integration</div>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li>Identify high-ROI AI opportunities across your existing stack</li>
+            <li>Deploy intelligent automation for dramatic efficiency gains</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
+          <i class="fas fa-chart-line"></i>
+          <div class="card-title">Productivity & Collaboration</div>
+        </div>
+        <div class="card-body">
+          <ul>
+            <li>Optimize Microsoft 365 suite (SharePoint, Power BI, Automate, Planner, Forms)</li>
+            <li>Eliminate tool sprawl & unlock massive productivity multipliers</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact-section">
+    <h2 class="contact-title">Whatever your need, we can solve IT.</h2>
+    <p class="contact-text">Book a consultation through (706) 877-3724 or Kyle.Burns@apromptpc.com</p>
+    <a href="tel:7068773724" class="cta-btn">Book a Call</a>
+  </section>
+
+  <footer>
+    <p>© 2026 A Prompt PC • Atlanta, GA • All rights reserved</p>
+  </footer>
+
+</body>
+</html>
