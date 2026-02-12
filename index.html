@@ -116,7 +116,7 @@
       background: linear-gradient(90deg, var(--accent), var(--purple));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 60px;
+      margin-bottom: 40px;
     }
     .grid {
       display: grid;
@@ -132,7 +132,7 @@
     .card {
       background: var(--card-bg);
       border-radius: 24px;
-      overflow: hidden;
+      overflow: visible;
       box-shadow: var(--shadow);
       transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
       position: relative;
@@ -147,14 +147,14 @@
       border-color: rgba(96,165,250,0.6);
     }
     .card-header {
-      padding: 90px 32px 40px;
+      padding: 100px 32px 40px;
       text-align: center;
       position: relative;
-      min-height: 220px;
+      min-height: 240px;
       overflow: visible;
     }
     .card-header i {
-      font-size: 5.4rem;
+      font-size: 5.6rem;
       color: white;
       opacity: 0.98;
       background: linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.06));
@@ -163,7 +163,7 @@
       line-height: 140px;
       border-radius: 50%;
       position: absolute;
-      top: -72px;
+      top: -80px;
       left: 50%;
       transform: translateX(-50%);
       box-shadow: 0 16px 40px rgba(0,0,0,0.8), inset 0 6px 20px rgba(255,255,255,0.25);
@@ -208,9 +208,23 @@
       text-shadow: 0 0 12px rgba(52,211,153,0.7);
     }
     .contact-section {
-      padding: 120px 20px;
+      padding: 100px 20px;
       text-align: center;
-      background: linear-gradient(to bottom, rgba(34,197,94,0.08), transparent);
+    }
+    .contact-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(96,165,250,0.25);
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 60px 40px;
+      transition: all 0.4s;
+    }
+    .contact-card:hover {
+      transform: translateY(-12px);
+      box-shadow: 0 30px 70px rgba(0,0,0,0.8), 0 0 50px var(--glow);
     }
     .contact-title {
       font-size: 3.5rem;
@@ -221,9 +235,7 @@
     .contact-text {
       font-size: 1.8rem;
       margin-bottom: 40px;
-      max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
+      color: #cbd5e1;
     }
     footer {
       text-align: center;
@@ -250,63 +262,6 @@
     <p class="location">Atlanta, GA, IT Consultants</p>
     <a href="tel:7068773724" class="cta-btn">Book a Call</a>
   </header>
-
-  <section class="values-section">
-    <h2 class="values-title">Save money!</h2>
-    <div class="underline"></div>
-
-    <div class="values-grid">
-      <div class="value-card">
-        <h3>Our Experience</h3>
-        <p>Kyle Burns and Team come prepared with more than 35 combined years in the IT industry. We have worked for and been the clients of multiple MSP’s. We have also created and maintained IT departments for multiple small to medium sized businesses. We are proficient in developing IT/security handbooks, SOPs, best practices, and streamlined onboarding/offboarding processes.</p>
-      </div>
-
-      <div class="value-card">
-        <h3>High ROI</h3>
-        <p>We have successfully rolled out our corporate restructuring for IT budgets to save $200,000 a year within three months. We have also achieved a quarter of a million dollars a year in IT savings within six months.</p>
-      </div>
-
-      <div class="value-card">
-        <h3>Satisfaction Guaranteed</h3>
-        <p>We are compensated directly by the value we bring to your organization. Our Pricing model is 25% of what we save your company’s IT budget.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="services-section">
-    <h2>Services</h2>
-    <div class="services-underline"></div>
-
-    <div class="grid">
-      <div class="card">
-        <div class="card-header" style="background: linear-gradient(135deg, #22c55e, #15803d);">
-          <i class="fas fa-shield-halved"></i>
-          <div class="card-title">Cybersecurity</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header" style="background: linear-gradient(135deg, #f97316, #c2410c);">
-          <i class="fas fa-dollar-sign"></i>
-          <div class="card-title">Budget Restructuring</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header" style="background: linear-gradient(135deg, #ec4899, #be185d);">
-          <i class="fas fa-brain"></i>
-          <div class="card-title">AI Implementation & IT Strategy</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
-          <i class="fas fa-handshake"></i>
-          <div class="card-title">Mergers and Acquisitions</div>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <section class="savings-section">
     <h2>Maximize Your Savings</h2>
@@ -425,10 +380,69 @@
     </div>
   </section>
 
+  <section class="services-section">
+    <h2>Services</h2>
+    <div class="services-underline"></div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-header" style="background: linear-gradient(135deg, #22c55e, #15803d);">
+          <i class="fas fa-shield-halved"></i>
+          <div class="card-title">Cybersecurity</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="background: linear-gradient(135deg, #f97316, #c2410c);">
+          <i class="fas fa-dollar-sign"></i>
+          <div class="card-title">Budget Restructuring</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="background: linear-gradient(135deg, #ec4899, #be185d);">
+          <i class="fas fa-brain"></i>
+          <div class="card-title">AI Implementation & IT Strategy</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+          <i class="fas fa-handshake"></i>
+          <div class="card-title">Mergers and Acquisitions</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="values-section">
+    <h2 class="values-title">Save money!</h2>
+    <div class="underline"></div>
+
+    <div class="values-grid">
+      <div class="value-card">
+        <h3>Our Experience</h3>
+        <p>Kyle Burns and Team come prepared with more than 35 combined years in the IT industry. We have worked for and been the clients of multiple MSP’s. We have also created and maintained IT departments for multiple small to medium sized businesses. We are proficient in developing IT/security handbooks, SOPs, best practices, and streamlined onboarding/offboarding processes.</p>
+      </div>
+
+      <div class="value-card">
+        <h3>High ROI</h3>
+        <p>We have successfully rolled out our corporate restructuring for IT budgets to save $200,000 a year within three months. We have also achieved a quarter of a million dollars a year in IT savings within six months.</p>
+      </div>
+
+      <div class="value-card">
+        <h3>Satisfaction Guaranteed</h3>
+        <p>We are compensated directly by the value we bring to your organization. Our Pricing model is 25% of what we save your company’s IT budget.</p>
+      </div>
+    </div>
+  </section>
+
   <section class="contact-section">
-    <h2 class="contact-title">Whatever your need, we can solve IT.</h2>
-    <p class="contact-text">Book a consultation through (706) 877-3724 or Kyle.Burns@apromptpc.com</p>
-    <a href="tel:7068773724" class="cta-btn">Book a Call</a>
+    <div class="contact-card">
+      <h2 class="contact-title">Whatever your need, we can solve IT.</h2>
+      <p class="contact-text">Book a consultation through (706) 877-3724 or Kyle.Burns@apromptpc.com</p>
+      <a href="tel:7068773724" class="cta-btn">Book a Call</a>
+    </div>
   </section>
 
   <footer>
