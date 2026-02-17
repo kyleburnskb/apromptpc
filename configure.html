@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build Your Stream — PilotCast AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #04060e;
+  --bg-card: #0a0e1a;
+  --bg-card-hover: #0f1424;
+  --bg-input: #0d1220;
+  --border: #1a1f35;
+  --border-glow: #2a3050;
+  --border-focus: #6366f1;
+  --text: #e8eaf0;
+  --text-dim: #7a82a0;
+  --text-muted: #4a5070;
+  --accent: #6366f1;
+  --accent-bright: #818cf8;
+  --accent2: #f59e0b;
+  --green: #22c55e;
+  --red: #ef4444;
+  --gradient-1: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+  --gradient-2: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+  --tier-starter: #22c55e;
+  --tier-growth: #6366f1;
+  --tier-enterprise: #f59e0b;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999;
+}
+
+/* ── NAV ──────────────────────── */
+nav {
+  position: fixed; top: 0; width: 100%; z-index: 100;
+  padding: 1rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  backdrop-filter: blur(20px);
+  background: rgba(4, 6, 14, 0.85);
+  border-bottom: 1px solid var(--border);
+}
+.logo { font-weight: 800; font-size: 1.4rem; letter-spacing: -0.03em; text-decoration: none; color: var(--text); }
+.logo span { color: var(--accent-bright); }
+
+.nav-right { display: flex; align-items: center; gap: 1.5rem; }
+.nav-back { color: var(--text-dim); text-decoration: none; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 0.4rem; transition: color 0.2s; }
+.nav-back:hover { color: var(--text); }
+
+/* Tier tracker in nav */
+.tier-tracker {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.4rem 1rem;
+  border-radius: 50px;
+  border: 1px solid var(--border);
+  background: rgba(10, 14, 26, 0.8);
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: all 0.4s ease;
+}
+.tier-tracker-label { color: var(--text-muted); }
+.tier-tracker-name { font-family: 'JetBrains Mono', monospace; font-weight: 700; transition: color 0.3s; }
+.tier-tracker-price { color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+.tier-tracker.starter { border-color: rgba(34,197,94,0.3); }
+.tier-tracker.starter .tier-tracker-name { color: var(--tier-starter); }
+.tier-tracker.growth { border-color: rgba(99,102,241,0.3); }
+.tier-tracker.growth .tier-tracker-name { color: var(--tier-growth); }
+.tier-tracker.enterprise { border-color: rgba(245,158,11,0.3); }
+.tier-tracker.enterprise .tier-tracker-name { color: var(--tier-enterprise); }
+
+/* ── LAYOUT ──────────────────── */
+.app {
+  max-width: 1200px; margin: 0 auto; padding: 6rem 2rem 4rem;
+  display: grid; grid-template-columns: 280px 1fr; gap: 3rem; min-height: 100vh;
+}
+
+/* ── SIDEBAR / PROGRESS ──────── */
+.sidebar { position: sticky; top: 5.5rem; height: fit-content; }
+.progress-track { display: flex; flex-direction: column; position: relative; }
+.progress-line { position: absolute; left: 17px; top: 36px; bottom: 18px; width: 2px; background: var(--border); }
+.progress-line-fill { position: absolute; left: 17px; top: 36px; width: 2px; background: var(--gradient-1); transition: height 0.6s cubic-bezier(0.16,1,0.3,1); }
+
+.step-indicator {
+  display: flex; align-items: center; gap: 1rem; padding: 0.8rem 0;
+  cursor: pointer; position: relative; z-index: 2;
+}
+.step-dot {
+  width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border);
+  background: var(--bg); display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600;
+  color: var(--text-muted); transition: all 0.4s ease; flex-shrink: 0;
+}
+.step-indicator.active .step-dot { border-color: var(--accent); color: var(--accent-bright); box-shadow: 0 0 20px rgba(99,102,241,0.25); background: rgba(99,102,241,0.1); }
+.step-indicator.done .step-dot { border-color: var(--green); color: var(--green); background: rgba(34,197,94,0.1); }
+.step-label { font-size: 0.85rem; font-weight: 500; color: var(--text-muted); transition: color 0.3s; }
+.step-indicator.active .step-label { color: var(--text); font-weight: 600; }
+.step-indicator.done .step-label { color: var(--text-dim); }
+.step-sublabel { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.15rem; }
+.step-indicator.done .step-sublabel { color: var(--green); }
+
+/* ── PANELS ──────────────────── */
+.main-content { min-height: 500px; }
+.step-panel { display: none; animation: panel-in 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+.step-panel.active { display: block; }
+@keyframes panel-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.panel-header { margin-bottom: 2.5rem; }
+.panel-header h2 { font-size: clamp(1.8rem,3.5vw,2.4rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.6rem; }
+.panel-header h2 .grad { background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.panel-header p { color: var(--text-dim); font-size: 1rem; line-height: 1.6; }
+
+/* ── TIER BADGES ─────────────── */
+.tier-badge {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em;
+  padding: 0.2rem 0.55rem; border-radius: 4px;
+  text-transform: uppercase;
+}
+.tier-badge.starter { color: var(--tier-starter); background: rgba(34,197,94,0.1); }
+.tier-badge.growth { color: var(--tier-growth); background: rgba(99,102,241,0.12); }
+.tier-badge.enterprise { color: var(--tier-enterprise); background: rgba(245,158,11,0.1); }
+
+/* Lock icon on cards */
+.tier-lock {
+  position: absolute; top: 0.7rem; right: 0.7rem;
+}
+
+/* ── NICHE GRID ──────────────── */
+.niche-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.niche-card {
+  background: var(--bg-card); border: 2px solid var(--border); border-radius: 14px;
+  padding: 1.8rem 1.2rem; text-align: center; cursor: pointer;
+  transition: all 0.3s ease; position: relative; overflow: hidden;
+}
+.niche-card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 0%, rgba(99,102,241,0.08), transparent 70%); opacity: 0; transition: opacity 0.3s; }
+.niche-card:hover { border-color: var(--border-glow); transform: translateY(-2px); }
+.niche-card:hover::before { opacity: 1; }
+.niche-card.selected { border-color: var(--accent); background: rgba(99,102,241,0.06); box-shadow: 0 0 30px rgba(99,102,241,0.1); }
+.niche-card.selected::before { opacity: 1; }
+.niche-icon { font-size: 2.2rem; margin-bottom: 0.8rem; position: relative; z-index: 1; }
+.niche-name { font-weight: 700; font-size: 1rem; margin-bottom: 0.3rem; position: relative; z-index: 1; }
+.niche-desc { font-size: 0.78rem; color: var(--text-dim); line-height: 1.4; position: relative; z-index: 1; }
+
+/* ── ADD-ON / FEATURE OPTION CARDS ── */
+.option-section { margin-top: 2.5rem; }
+.option-section-title { font-size: 0.8rem; font-weight: 700; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1rem; }
+
+.option-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
+
+.option-card {
+  display: flex; align-items: center; gap: 0.9rem;
+  padding: 1rem 1.1rem; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--bg-card);
+  cursor: pointer; transition: all 0.25s; position: relative;
+}
+.option-card:hover { border-color: var(--border-glow); background: var(--bg-card-hover); }
+.option-card.selected { border-color: var(--accent); background: rgba(99,102,241,0.06); }
+.option-card.selected.growth-sel { border-color: var(--tier-growth); background: rgba(99,102,241,0.06); }
+.option-card.selected.enterprise-sel { border-color: var(--tier-enterprise); background: rgba(245,158,11,0.04); }
+
+.option-check {
+  width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.2s; font-size: 0.7rem; color: transparent;
+}
+.option-card.selected .option-check { border-color: var(--green); color: var(--green); background: rgba(34,197,94,0.1); }
+.option-card.included .option-check { border-color: var(--green); color: var(--green); background: rgba(34,197,94,0.1); }
+
+.option-info { flex: 1; }
+.option-name { font-size: 0.88rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+.option-desc { font-size: 0.75rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+.option-card.included { cursor: default; opacity: 0.7; }
+.option-card.included .option-name::after { content: 'INCLUDED'; font-size: 0.6rem; color: var(--green); font-weight: 700; letter-spacing: 0.06em; }
+
+/* ── INPUT FIELDS ────────────── */
+.field-group { margin-bottom: 1.8rem; }
+.field-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text); }
+.field-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; }
+.field-input {
+  width: 100%; padding: 0.9rem 1.1rem; border-radius: 10px; border: 1px solid var(--border);
+  background: var(--bg-input); color: var(--text); font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem; transition: all 0.2s; outline: none;
+}
+.field-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+.field-input::placeholder { color: var(--text-muted); }
+textarea.field-input { resize: vertical; min-height: 80px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+
+/* ── CHIPS ───────────────────── */
+.chip-grid { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.chip {
+  padding: 0.55rem 1.1rem; border-radius: 50px; border: 1px solid var(--border);
+  background: var(--bg-card); cursor: pointer; font-size: 0.85rem;
+  font-weight: 500; color: var(--text-dim); transition: all 0.2s;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+}
+.chip:hover { border-color: var(--border-glow); color: var(--text); }
+.chip.selected { border-color: var(--accent); background: rgba(99,102,241,0.1); color: var(--accent-bright); }
+
+/* ── VOICE CARDS ─────────────── */
+.voice-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.voice-card {
+  background: var(--bg-card); border: 2px solid var(--border); border-radius: 12px;
+  padding: 1.4rem; cursor: pointer; transition: all 0.3s;
+  display: flex; align-items: center; gap: 1rem; position: relative;
+}
+.voice-card:hover { border-color: var(--border-glow); }
+.voice-card.selected { border-color: var(--accent); background: rgba(99,102,241,0.06); }
+.voice-card.selected.enterprise-sel { border-color: var(--tier-enterprise); background: rgba(245,158,11,0.04); }
+.voice-wave {
+  width: 48px; height: 48px; border-radius: 50%; background: rgba(99,102,241,0.1);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.3rem;
+}
+.voice-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.15rem; display: flex; align-items: center; gap: 0.5rem; }
+.voice-desc { font-size: 0.78rem; color: var(--text-dim); }
+
+/* ── COLOR / THEME ───────────── */
+.color-row { display: flex; gap: 1.5rem; align-items: flex-end; margin-bottom: 1.5rem; }
+.color-pick { text-align: center; }
+.color-pick label { display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.4rem; font-weight: 500; }
+.color-swatch { width: 56px; height: 56px; border-radius: 12px; border: 2px solid var(--border); cursor: pointer; overflow: hidden; position: relative; }
+.color-swatch input[type="color"] { position: absolute; inset: -8px; width: 72px; height: 72px; border: none; cursor: pointer; }
+
+.theme-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; }
+.theme-card {
+  border-radius: 12px; border: 2px solid var(--border); overflow: hidden;
+  cursor: pointer; transition: all 0.3s; position: relative;
+}
+.theme-card:hover { border-color: var(--border-glow); transform: translateY(-2px); }
+.theme-card.selected { border-color: var(--accent); box-shadow: 0 0 20px rgba(99,102,241,0.15); }
+.theme-preview { height: 80px; position: relative; overflow: hidden; }
+.theme-label { padding: 0.6rem 0.8rem; background: var(--bg-card); font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; justify-content: space-between; }
+
+/* ── BUTTONS ─────────────────── */
+.btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+.btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.8rem 2rem; border-radius: 10px; font-family: 'Outfit', sans-serif;
+  font-weight: 700; font-size: 0.95rem; text-decoration: none;
+  cursor: pointer; border: none; transition: all 0.3s ease;
+}
+.btn-primary { background: var(--gradient-1); color: white; box-shadow: 0 4px 20px rgba(99,102,241,0.3); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(99,102,241,0.5); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-back { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
+.btn-back:hover { border-color: var(--border-glow); color: var(--text); }
+
+/* ── STREAM PREVIEW ──────────── */
+.preview-container {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+  overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 120px rgba(99,102,241,0.06);
+}
+.preview-titlebar {
+  display: flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1rem;
+  background: rgba(10,14,26,0.9); border-bottom: 1px solid var(--border);
+}
+.preview-dot { width: 10px; height: 10px; border-radius: 50%; }
+.preview-dot:nth-child(1) { background: #ef4444; }
+.preview-dot:nth-child(2) { background: #f59e0b; }
+.preview-dot:nth-child(3) { background: #22c55e; }
+.preview-titlebar span { margin-left: 0.5rem; color: var(--text-muted); font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; }
+
+.preview-stream { aspect-ratio: 16/9; position: relative; overflow: hidden; }
+.preview-bg { position: absolute; inset: 0; transition: background 0.6s ease; }
+.preview-grid {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.preview-particles { position: absolute; inset: 0; }
+.particle {
+  position: absolute; width: 3px; height: 3px; border-radius: 50%;
+  opacity: 0.4; animation: float-up linear infinite;
+}
+@keyframes float-up {
+  0% { transform: translateY(100%) translateX(0); opacity: 0; }
+  10% { opacity: 0.4; } 90% { opacity: 0.4; }
+  100% { transform: translateY(-20px) translateX(20px); opacity: 0; }
+}
+
+.preview-overlay { position: absolute; inset: 0; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; z-index: 2; }
+.preview-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.preview-live { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.65rem; border-radius: 4px; background: #ef4444; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.06em; }
+.preview-live-dot { width: 6px; height: 6px; border-radius: 50%; background: white; animation: blink 1.5s infinite; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+.preview-viewers { font-size: 0.65rem; color: rgba(255,255,255,0.6); font-family: 'JetBrains Mono', monospace; }
+
+.preview-center { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+/* Avatar */
+.preview-avatar {
+  width: 100px; height: 100px; border-radius: 50%; position: relative;
+  margin-bottom: 0.6rem; transition: all 0.6s ease;
+}
+.preview-avatar-ring {
+  position: absolute; inset: -4px; border-radius: 50%;
+  border: 2px solid transparent; transition: all 0.6s;
+  animation: ring-rotate 8s linear infinite;
+}
+@keyframes ring-rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.preview-avatar-inner {
+  width: 100%; height: 100%; border-radius: 50%;
+  overflow: hidden; position: relative;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(4px);
+  border: 2px solid rgba(255,255,255,0.08);
+}
+.preview-avatar svg { width: 100%; height: 100%; }
+
+.preview-avatar-glow {
+  position: absolute; inset: -20px; border-radius: 50%;
+  opacity: 0.4; filter: blur(20px); transition: all 0.6s;
+  animation: avatar-glow-pulse 3s ease infinite;
+}
+@keyframes avatar-glow-pulse { 0%,100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.05); } }
+
+/* Personality-specific avatar accents */
+.preview-avatar[data-personality="energetic"] .preview-avatar-ring { border-top-color: currentColor; border-right-color: currentColor; }
+.preview-avatar[data-personality="calm"] .preview-avatar-ring { border-color: currentColor; opacity: 0.3; animation-duration: 20s; }
+.preview-avatar[data-personality="witty"] .preview-avatar-ring { border-top-color: currentColor; border-left-color: currentColor; animation-direction: reverse; }
+.preview-avatar[data-personality="professional"] .preview-avatar-ring { border-color: currentColor; opacity: 0.5; border-radius: 50%; animation: none; }
+.preview-avatar[data-personality="hype"] .preview-avatar-ring { border-top-color: currentColor; border-right-color: currentColor; border-bottom-color: currentColor; animation-duration: 3s; }
+.preview-avatar[data-personality="storyteller"] .preview-avatar-ring { border-top-color: currentColor; animation-duration: 12s; border-style: dashed; }
+
+/* Speaking state */
+.preview-avatar.speaking .preview-avatar-glow { opacity: 0.7; animation-duration: 1.5s; }
+.preview-avatar.speaking .preview-avatar-ring { animation-duration: 2s !important; }
+.preview-host-name { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; text-shadow: 0 2px 20px rgba(0,0,0,0.5); margin-bottom: 0.3rem; }
+.preview-channel-name { font-size: 0.85rem; font-weight: 500; opacity: 0.7; }
+.preview-speaking {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.7rem;
+  font-weight: 700; letter-spacing: 0.06em; margin-top: 0.6rem;
+  animation: speaking-pulse 2s ease infinite;
+}
+@keyframes speaking-pulse { 0%,100% { opacity: 0.8; } 50% { opacity: 1; } }
+.speaking-bars { display: flex; gap: 2px; align-items: flex-end; height: 12px; }
+.speaking-bar { width: 2px; background: currentColor; border-radius: 1px; animation: bar-bounce 0.8s ease infinite; }
+.speaking-bar:nth-child(1) { height: 4px; animation-delay: 0s; }
+.speaking-bar:nth-child(2) { height: 8px; animation-delay: 0.15s; }
+.speaking-bar:nth-child(3) { height: 6px; animation-delay: 0.3s; }
+.speaking-bar:nth-child(4) { height: 10px; animation-delay: 0.1s; }
+@keyframes bar-bounce { 0%,100% { transform: scaleY(0.5); } 50% { transform: scaleY(1); } }
+
+.preview-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+.preview-tickers { display: flex; gap: 0.5rem; }
+.preview-ticker {
+  padding: 0.3rem 0.6rem; border-radius: 6px; background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px); font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem; font-weight: 500; border: 1px solid rgba(255,255,255,0.06);
+}
+.preview-disclaimer { font-size: 0.5rem; color: rgba(255,255,255,0.25); max-width: 280px; text-align: right; line-height: 1.4; }
+
+.preview-chat { padding: 1rem 1.5rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.5rem; }
+.pchat-msg { font-size: 0.8rem; opacity: 0; animation: chat-in 0.4s ease forwards; }
+.pchat-msg:nth-child(1) { animation-delay: 0.5s; }
+.pchat-msg:nth-child(2) { animation-delay: 1.5s; }
+.pchat-msg:nth-child(3) { animation-delay: 2.8s; }
+.pchat-msg:nth-child(4) { animation-delay: 4s; }
+@keyframes chat-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── GATE BOX ────────────────── */
+.gate-overlay { margin-top: 2.5rem; text-align: center; }
+.gate-box {
+  background: linear-gradient(160deg, rgba(15,20,40,0.95), rgba(10,14,28,0.98));
+  border: 1px solid rgba(99,102,241,0.25); border-radius: 20px;
+  padding: 3rem 2.5rem; position: relative; overflow: hidden;
+}
+.gate-box::before { content: ''; position: absolute; top: -80px; right: -80px; width: 250px; height: 250px; background: radial-gradient(circle, rgba(99,102,241,0.08), transparent); border-radius: 50%; }
+
+.gate-tier-display {
+  display: inline-block;
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 1.5rem;
+  position: relative; z-index: 1;
+  transition: all 0.4s;
+}
+.gate-tier-display.starter { color: var(--tier-starter); background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); }
+.gate-tier-display.growth { color: var(--tier-growth); background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3); }
+.gate-tier-display.enterprise { color: var(--tier-enterprise); background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); }
+
+.gate-title { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.8rem; position: relative; z-index: 1; }
+.gate-price { font-size: 2.5rem; font-weight: 800; margin-bottom: 0.3rem; position: relative; z-index: 1; font-family: 'JetBrains Mono', monospace; }
+.gate-price span { font-size: 1rem; font-weight: 400; color: var(--text-dim); }
+.gate-sub { color: var(--text-dim); font-size: 0.95rem; line-height: 1.6; max-width: 520px; margin: 0 auto 1.5rem; position: relative; z-index: 1; }
+
+/* Tier reason pills */
+.tier-reasons {
+  display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;
+  margin-bottom: 2rem; position: relative; z-index: 1;
+}
+.tier-reason {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.4rem 0.9rem; border-radius: 50px; font-size: 0.78rem; font-weight: 600;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+}
+.tier-reason .reason-icon { font-size: 0.85rem; }
+.tier-reason.upgradeable { cursor: pointer; }
+.tier-reason.upgradeable:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); }
+.tier-reason .downgrade-hint { color: var(--text-muted); font-size: 0.65rem; margin-left: 0.3rem; }
+
+.gate-ctas { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+
+.btn-gate {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 1rem 2.2rem; border-radius: 12px; font-family: 'Outfit', sans-serif;
+  font-weight: 700; font-size: 1rem; text-decoration: none;
+  cursor: pointer; border: none; transition: all 0.3s ease;
+}
+.btn-gate-primary { background: var(--gradient-1); color: white; box-shadow: 0 6px 30px rgba(99,102,241,0.35); }
+.btn-gate-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 40px rgba(99,102,241,0.5); }
+.btn-gate-secondary { background: transparent; color: var(--text); border: 1px solid var(--border-glow); }
+.btn-gate-secondary:hover { border-color: var(--accent); }
+
+.gate-note { color: var(--text-muted); font-size: 0.8rem; margin-top: 1.2rem; position: relative; z-index: 1; }
+
+/* Config summary */
+.config-summary { display: grid; grid-template-columns: repeat(2,1fr); gap: 0.6rem; max-width: 500px; margin: 0 auto 1.5rem; position: relative; z-index: 1; }
+.config-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.8rem; background: rgba(255,255,255,0.03); border-radius: 8px; font-size: 0.78rem; }
+.config-item-label { color: var(--text-muted); }
+.config-item-value { color: var(--text); font-weight: 600; }
+
+/* ── RESPONSIVE ──────────────── */
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; gap: 1.5rem; }
+  .sidebar { position: relative; top: 0; }
+  .progress-track { flex-direction: row; overflow-x: auto; gap: 0.5rem; padding-bottom: 0.5rem; }
+  .progress-line, .progress-line-fill { display: none; }
+  .step-indicator { flex-direction: column; text-align: center; min-width: 70px; }
+  .step-label { font-size: 0.7rem; }
+  .step-sublabel { display: none; }
+  .niche-grid, .option-grid { grid-template-columns: 1fr; }
+  .voice-grid { grid-template-columns: 1fr; }
+  .field-row { grid-template-columns: 1fr; }
+  .theme-grid { grid-template-columns: repeat(2,1fr); }
+  .config-summary { grid-template-columns: 1fr; }
+  .tier-tracker { display: none; }
+}
+@media (max-width: 500px) {
+  .niche-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/pilotcast.html" class="logo">Pilot<span>Cast</span> AI</a>
+  <div class="nav-right">
+    <div class="tier-tracker starter" id="tierTracker">
+      <span class="tier-tracker-label">Your plan:</span>
+      <span class="tier-tracker-name" id="tierTrackerName">Starter</span>
+      <span class="tier-tracker-price" id="tierTrackerPrice">$499/mo</span>
+    </div>
+    <a href="/pilotcast.html" class="nav-back">&#8592; Home</a>
+  </div>
+</nav>
+
+<div class="app">
+<aside class="sidebar">
+  <div class="progress-track">
+    <div class="progress-line"></div>
+    <div class="progress-line-fill" id="progressFill"></div>
+    <div class="step-indicator active" data-step="0" onclick="goToStep(0)">
+      <div class="step-dot">01</div>
+      <div><div class="step-label">Niche</div><div class="step-sublabel" id="sub0">Pick your topic</div></div>
+    </div>
+    <div class="step-indicator" data-step="1" onclick="goToStep(1)">
+      <div class="step-dot">02</div>
+      <div><div class="step-label">AI Host</div><div class="step-sublabel" id="sub1">Name &amp; personality</div></div>
+    </div>
+    <div class="step-indicator" data-step="2" onclick="goToStep(2)">
+      <div class="step-dot">03</div>
+      <div><div class="step-label">Voice</div><div class="step-sublabel" id="sub2">Choose a voice</div></div>
+    </div>
+    <div class="step-indicator" data-step="3" onclick="goToStep(3)">
+      <div class="step-dot">04</div>
+      <div><div class="step-label">Brand</div><div class="step-sublabel" id="sub3">Colors &amp; theme</div></div>
+    </div>
+    <div class="step-indicator locked" data-step="4" onclick="goToStep(4)">
+      <div class="step-dot">05</div>
+      <div><div class="step-label">Preview</div><div class="step-sublabel" id="sub4">See your stream</div></div>
+    </div>
+  </div>
+</aside>
+
+<div class="main-content">
+
+<!-- ═══ STEP 0: NICHE ═══ -->
+<div class="step-panel active" id="panel0">
+  <div class="panel-header">
+    <h2>What's your <span class="grad">niche</span>?</h2>
+    <p>Pick the vertical that fits your audience. We configure data feeds, content engine, and commands around it.</p>
+  </div>
+  <div class="niche-grid" id="nicheGrid">
+    <div class="niche-card" data-niche="finance" onclick="selectNiche(this)">
+      <div class="niche-icon">&#128200;</div>
+      <div class="niche-name">Finance</div>
+      <div class="niche-desc">Stocks, crypto, forex — real-time market data</div>
+    </div>
+    <div class="niche-card" data-niche="sports" onclick="selectNiche(this)">
+      <div class="niche-icon">&#127944;</div>
+      <div class="niche-name">Sports</div>
+      <div class="niche-desc">Scores, standings, live commentary</div>
+    </div>
+    <div class="niche-card" data-niche="space" onclick="selectNiche(this)">
+      <div class="niche-icon">&#127756;</div>
+      <div class="niche-name">Space</div>
+      <div class="niche-desc">Astronomy, missions, cosmic storytelling</div>
+    </div>
+    <div class="niche-card" data-niche="gaming" onclick="selectNiche(this)">
+      <div class="niche-icon">&#127918;</div>
+      <div class="niche-name">Gaming</div>
+      <div class="niche-desc">Stats, tournaments, esports</div>
+    </div>
+    <div class="niche-card" data-niche="news" onclick="selectNiche(this)">
+      <div class="niche-icon">&#128240;</div>
+      <div class="niche-name">News</div>
+      <div class="niche-desc">Breaking stories, AI analysis</div>
+    </div>
+    <div class="niche-card" data-niche="custom" onclick="selectNiche(this)">
+      <div class="niche-icon">&#10024;</div>
+      <div class="niche-name">Custom</div>
+      <div class="niche-desc">Fitness, music, education — any idea</div>
+    </div>
+  </div>
+
+  <!-- Data feed options -->
+  <div class="option-section" id="dataOptions" style="display:none;">
+    <div class="option-section-title">Data Feed Speed</div>
+    <div class="option-grid">
+      <div class="option-card included" data-tier="starter" data-option="data-standard">
+        <div class="option-check">&#10003;</div>
+        <div class="option-info">
+          <div class="option-name">Standard Feeds</div>
+          <div class="option-desc">Data updates every 15-30 seconds</div>
+        </div>
+      </div>
+      <div class="option-card" data-tier="growth" data-option="data-enhanced" onclick="toggleOption(this)">
+        <div class="option-check">&#10003;</div>
+        <div class="option-info">
+          <div class="option-name">Enhanced Feeds <span class="tier-badge growth">GROWTH</span></div>
+          <div class="option-desc">5-10s refresh, more sources, priority alerts</div>
+        </div>
+      </div>
+      <div class="option-card" data-tier="enterprise" data-option="data-realtime" onclick="toggleOption(this)">
+        <div class="option-check">&#10003;</div>
+        <div class="option-info">
+          <div class="option-name">Real-Time Feeds <span class="tier-badge enterprise">ENTERPRISE</span></div>
+          <div class="option-desc">Sub-second data, premium APIs, custom integrations</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="option-section-title" style="margin-top:1.5rem;">Streaming</div>
+    <div class="option-grid">
+      <div class="option-card included" data-tier="starter" data-option="platform-single">
+        <div class="option-check">&#10003;</div>
+        <div class="option-info">
+          <div class="option-name">Single Platform</div>
+          <div class="option-desc">YouTube, Twitch, or Kick — pick one</div>
+        </div>
+      </div>
+      <div class="option-card" data-tier="growth" data-option="platform-dual" onclick="toggleOption(this)">
+        <div class="option-check">&#10003;</div>
+        <div class="option-info">
+          <div class="option-name">Dual Simulcast <span class="tier-badge growth">GROWTH</span></div>
+          <div class="option-desc">Stream to 2 platforms at once</div>
+        </div>
+      </div>
+      <div class="option-card" data-tier="enterprise" data-option="platform-multi" onclick="toggleOption(this)">
+        <div class="option-check">&#10003;</div>
+        <div class="option-info">
+          <div class="option-name">Multi-Platform <span class="tier-badge enterprise">ENTERPRISE</span></div>
+          <div class="option-desc">YouTube + Twitch + X + Rumble — everywhere</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <div></div>
+    <button class="btn btn-primary" id="btn0" disabled onclick="nextStep()">Continue &#8594;</button>
+  </div>
+</div>
+
+<!-- ═══ STEP 1: AI HOST ═══ -->
+<div class="step-panel" id="panel1">
+  <div class="panel-header">
+    <h2>Design your <span class="grad">AI host</span></h2>
+    <p>Your host talks, engages, and keeps your audience coming back 24/7. Give them an identity.</p>
+  </div>
+  <div class="field-group">
+    <label class="field-label">Host name</label>
+    <input type="text" class="field-input" id="hostName" placeholder="e.g. Estrong, Nova, Atlas, Coach" oninput="updateHost()">
+    <div class="field-hint">Viewers interact with this name in chat commands.</div>
+  </div>
+  <div class="field-group">
+    <label class="field-label">Base personality</label>
+    <div class="field-hint" style="margin-bottom:0.6rem;margin-top:-0.2rem">This is your host's default vibe — how they sound all the time.</div>
+    <div class="chip-grid" id="personalityChips">
+      <div class="chip" data-val="energetic" onclick="selectChip(this)">&#9889; Energetic</div>
+      <div class="chip" data-val="calm" onclick="selectChip(this)">&#127754; Calm</div>
+      <div class="chip" data-val="witty" onclick="selectChip(this)">&#128526; Witty</div>
+      <div class="chip" data-val="professional" onclick="selectChip(this)">&#128188; Professional</div>
+      <div class="chip" data-val="hype" onclick="selectChip(this)">&#128293; Hype</div>
+      <div class="chip" data-val="storyteller" onclick="selectChip(this)">&#128218; Storyteller</div>
+    </div>
+  </div>
+  <div class="field-group">
+    <label class="field-label">Catchphrase <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+    <input type="text" class="field-input" id="catchphrase" placeholder='"Knowledge is the real currency."' oninput="updateHost()">
+  </div>
+  <div class="field-group">
+    <label class="field-label">Channel name</label>
+    <input type="text" class="field-input" id="channelName" placeholder="e.g. Rich Mentality, Cosmic Drift Live" oninput="updateHost()">
+  </div>
+
+  <!-- Host add-ons -->
+  <div class="option-section">
+    <div class="option-section-title">Host Features</div>
+    <div class="option-grid">
+      <div class="option-card included" data-tier="starter" data-option="host-basic">
+        <div class="option-check">&#10003;</div>
+        <div class="option-info">
+          <div class="option-name">15 Chat Commands</div>
+          <div class="option-desc">!ask, !help, !price, !edu and more</div>
+        </div>
+      </div>
+      <div class="option-card" data-tier="growth" data-option="host-priority" onclick="toggleOption(this)">
+        <div class="option-check">&#10003;</div>
+        <div class="option-info">
+          <div class="option-name">Priority Queue for Subs <span class="tier-badge growth">GROWTH</span></div>
+          <div class="option-desc">Subscriber commands jump the queue</div>
+        </div>
+      </div>
+      <div class="option-card" data-tier="growth" data-option="host-analytics" onclick="toggleOption(this)">
+        <div class="option-check">&#10003;</div>
+        <div class="option-info">
+          <div class="option-name">Weekly Analytics <span class="tier-badge growth">GROWTH</span></div>
+          <div class="option-desc">Viewer trends, top commands, engagement report</div>
+        </div>
+      </div>
+      <div class="option-card" data-tier="enterprise" data-option="host-takeover" onclick="toggleOption(this)">
+        <div class="option-check">&#10003;</div>
+        <div class="option-info">
+          <div class="option-name">Host Takeover Mode <span class="tier-badge enterprise">ENTERPRISE</span></div>
+          <div class="option-desc">Go live yourself anytime — AI seamlessly hands off</div>
+        </div>
+      </div>
+      <div class="option-card" data-tier="enterprise" data-option="host-custom-cmds" onclick="toggleOption(this)">
+        <div class="option-check">&#10003;</div>
+        <div class="option-info">
+          <div class="option-name">Custom Commands <span class="tier-badge enterprise">ENTERPRISE</span></div>
+          <div class="option-desc">Build any command your niche needs</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-back" onclick="prevStep()">&#8592; Back</button>
+    <button class="btn btn-primary" id="btn1" disabled onclick="nextStep()">Continue &#8594;</button>
+  </div>
+</div>
+
+<!-- ═══ STEP 2: VOICE ═══ -->
+<div class="step-panel" id="panel2">
+  <div class="panel-header">
+    <h2>Pick a <span class="grad">voice</span></h2>
+    <p>Choose a voice for your AI host, or go premium with voice cloning.</p>
+  </div>
+  <div class="voice-grid" id="voiceGrid">
+    <div class="voice-card" data-voice="jenny" data-tier="starter" onclick="selectVoice(this)">
+      <div class="voice-wave">&#127908;</div>
+      <div><div class="voice-name">Jenny</div><div class="voice-desc">Clear, professional, female</div></div>
+    </div>
+    <div class="voice-card" data-voice="guy" data-tier="starter" onclick="selectVoice(this)">
+      <div class="voice-wave">&#127908;</div>
+      <div><div class="voice-name">Guy</div><div class="voice-desc">Warm, authoritative, male</div></div>
+    </div>
+    <div class="voice-card" data-voice="aria" data-tier="starter" onclick="selectVoice(this)">
+      <div class="voice-wave">&#127908;</div>
+      <div><div class="voice-name">Aria</div><div class="voice-desc">Smooth, expressive, female</div></div>
+    </div>
+    <div class="voice-card" data-voice="davis" data-tier="starter" onclick="selectVoice(this)">
+      <div class="voice-wave">&#127908;</div>
+      <div><div class="voice-name">Davis</div><div class="voice-desc">Energetic, bold, male</div></div>
+    </div>
+    <div class="voice-card" data-voice="clone" data-tier="enterprise" onclick="selectVoice(this)">
+      <div class="voice-wave">&#129302;</div>
+      <div>
+        <div class="voice-name">Clone My Voice <span class="tier-badge enterprise">ENTERPRISE</span></div>
+        <div class="voice-desc">AI sounds exactly like you — ElevenLabs integration</div>
+      </div>
+    </div>
+    <div class="voice-card" data-voice="custom" data-tier="enterprise" onclick="selectVoice(this)">
+      <div class="voice-wave">&#127911;</div>
+      <div>
+        <div class="voice-name">Custom Voice <span class="tier-badge enterprise">ENTERPRISE</span></div>
+        <div class="voice-desc">Accent, tone, speed — fully custom</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option-section">
+    <div class="option-section-title">Voice Features</div>
+    <div class="option-grid">
+      <div class="option-card included" data-tier="starter" data-option="voice-edge">
+        <div class="option-check">&#10003;</div>
+        <div class="option-info">
+          <div class="option-name">Edge-TTS Engine</div>
+          <div class="option-desc">Fast, natural-sounding, 6 voices</div>
+        </div>
+      </div>
+      <div class="option-card" data-tier="growth" data-option="voice-multilang" onclick="toggleOption(this)">
+        <div class="option-check">&#10003;</div>
+        <div class="option-info">
+          <div class="option-name">Multi-Language <span class="tier-badge growth">GROWTH</span></div>
+          <div class="option-desc">Host speaks in Spanish, French, Japanese + more</div>
+        </div>
+      </div>
+      <div class="option-card" data-tier="enterprise" data-option="voice-emotion" onclick="toggleOption(this)">
+        <div class="option-check">&#10003;</div>
+        <div class="option-info">
+          <div class="option-name">Reactive Tone <span class="tier-badge enterprise">ENTERPRISE</span></div>
+          <div class="option-desc">Voice reacts to live events — excited on big moves, cautious on dips, calm at night</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-back" onclick="prevStep()">&#8592; Back</button>
+    <button class="btn btn-primary" id="btn2" disabled onclick="nextStep()">Continue &#8594;</button>
+  </div>
+</div>
+
+<!-- ═══ STEP 3: BRAND ═══ -->
+<div class="step-panel" id="panel3">
+  <div class="panel-header">
+    <h2>Brand your <span class="grad">stream</span></h2>
+    <p>Your stream should look like your brand, not ours. Pick colors and a visual theme.</p>
+  </div>
+  <div class="color-row">
+    <div class="color-pick"><label>Primary</label><div class="color-swatch"><input type="color" id="colorPrimary" value="#6366f1" onchange="updateColors()"></div></div>
+    <div class="color-pick"><label>Accent</label><div class="color-swatch"><input type="color" id="colorAccent" value="#f59e0b" onchange="updateColors()"></div></div>
+    <div class="color-pick"><label>Background</label><div class="color-swatch"><input type="color" id="colorBg" value="#0a0a2e" onchange="updateColors()"></div></div>
+  </div>
+  <div class="field-group">
+    <label class="field-label">Visual theme</label>
+    <div class="theme-grid" id="themeGrid">
+      <div class="theme-card selected" data-theme="dark_grid" onclick="selectTheme(this)">
+        <div class="theme-preview" style="background: linear-gradient(145deg,#0a0a2e,#0f0f3a); background-image: linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px), linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px); background-size: 100% 100%, 30px 30px, 30px 30px;"></div>
+        <div class="theme-label">Dark Grid</div>
+      </div>
+      <div class="theme-card" data-theme="nebula" onclick="selectTheme(this)">
+        <div class="theme-preview" style="background: radial-gradient(ellipse at 30% 50%,#1a0533,#080420,#03010d);"></div>
+        <div class="theme-label">Nebula</div>
+      </div>
+      <div class="theme-card" data-theme="matrix" onclick="selectTheme(this)">
+        <div class="theme-preview" style="background: linear-gradient(180deg,#001a00,#000d00);"></div>
+        <div class="theme-label">Matrix</div>
+      </div>
+      <div class="theme-card" data-theme="sunset" data-tier="growth" onclick="selectTheme(this)">
+        <div class="theme-preview" style="background: linear-gradient(160deg,#1a0a2e,#2d0a1e,#1a0505);"></div>
+        <div class="theme-label">Sunset <span class="tier-badge growth">GROWTH</span></div>
+      </div>
+      <div class="theme-card" data-theme="ocean" data-tier="growth" onclick="selectTheme(this)">
+        <div class="theme-preview" style="background: linear-gradient(180deg,#0a1628,#051020,#020810);"></div>
+        <div class="theme-label">Ocean <span class="tier-badge growth">GROWTH</span></div>
+      </div>
+      <div class="theme-card" data-theme="custom" data-tier="enterprise" onclick="selectTheme(this)">
+        <div class="theme-preview" id="customThemePreview" style="background: linear-gradient(145deg,#0a0a2e,#0f0f3a);"></div>
+        <div class="theme-label">Fully Custom <span class="tier-badge enterprise">ENTERPRISE</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option-section">
+    <div class="option-section-title">Visual Features</div>
+    <div class="option-grid">
+      <div class="option-card included" data-tier="starter" data-option="vis-basic">
+        <div class="option-check">&#10003;</div>
+        <div class="option-info">
+          <div class="option-name">Animated Backgrounds</div>
+          <div class="option-desc">Particles, grids, and dynamic effects</div>
+        </div>
+      </div>
+      <div class="option-card" data-tier="growth" data-option="vis-avatar" onclick="toggleOption(this)">
+        <div class="option-check">&#10003;</div>
+        <div class="option-info">
+          <div class="option-name">AI Avatar on Stream <span class="tier-badge growth">GROWTH</span></div>
+          <div class="option-desc">AI-generated face for your host — appears when speaking</div>
+        </div>
+      </div>
+      <div class="option-card" data-tier="enterprise" data-option="vis-logo" onclick="toggleOption(this)">
+        <div class="option-check">&#10003;</div>
+        <div class="option-info">
+          <div class="option-name">Custom Logo + Overlays <span class="tier-badge enterprise">ENTERPRISE</span></div>
+          <div class="option-desc">Your logo, custom lower thirds, branded transitions</div>
+        </div>
+      </div>
+      <div class="option-card" data-tier="enterprise" data-option="vis-dedicated" onclick="toggleOption(this)">
+        <div class="option-check">&#10003;</div>
+        <div class="option-info">
+          <div class="option-name">Dedicated Server <span class="tier-badge enterprise">ENTERPRISE</span></div>
+          <div class="option-desc">Your own server — not shared with other streams</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-back" onclick="prevStep()">&#8592; Back</button>
+    <button class="btn btn-primary" onclick="nextStep()">See My Stream &#8594;</button>
+  </div>
+</div>
+
+<!-- ═══ STEP 4: PREVIEW + GATE ═══ -->
+<div class="step-panel" id="panel4">
+  <div class="panel-header">
+    <h2>Here's your <span class="grad">stream</span></h2>
+    <p>This is what your 24/7 AI-powered livestream would look like — personalized to everything you just configured.</p>
+  </div>
+
+  <div class="preview-container">
+    <div class="preview-titlebar">
+      <div class="preview-dot"></div><div class="preview-dot"></div><div class="preview-dot"></div>
+      <span>youtube.com/live</span>
+    </div>
+    <div class="preview-stream" id="previewStream">
+      <div class="preview-bg" id="previewBg"></div>
+      <div class="preview-grid"></div>
+      <div class="preview-particles" id="previewParticles"></div>
+      <div class="preview-overlay">
+        <div class="preview-top">
+          <div class="preview-live"><div class="preview-live-dot"></div> LIVE</div>
+          <div class="preview-viewers">&#128101; 247 watching</div>
+        </div>
+        <div class="preview-center">
+          <div class="preview-avatar speaking" id="previewAvatar" data-personality="energetic">
+            <div class="preview-avatar-glow" id="avatarGlow"></div>
+            <div class="preview-avatar-ring" id="avatarRing"></div>
+            <div class="preview-avatar-inner">
+              <svg id="avatarSvg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"></svg>
+            </div>
+          </div>
+          <div class="preview-host-name" id="previewHostName">Host</div>
+          <div class="preview-channel-name" id="previewChannelName">Channel</div>
+          <div class="preview-speaking" id="previewSpeaking">
+            <div class="speaking-bars"><div class="speaking-bar"></div><div class="speaking-bar"></div><div class="speaking-bar"></div><div class="speaking-bar"></div></div>
+            <span id="previewSpeakingText">SPEAKING</span>
+          </div>
+        </div>
+        <div class="preview-bottom">
+          <div class="preview-tickers" id="previewTickers"></div>
+          <div class="preview-disclaimer" id="previewDisclaimer"></div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-chat" id="previewChat"></div>
+  </div>
+
+  <!-- GATE -->
+  <div class="gate-overlay">
+    <div class="gate-box">
+      <div class="gate-tier-display starter" id="gateTierBadge">STARTER PLAN</div>
+      <div class="gate-title" id="gateTitle">Your stream is ready.</div>
+      <div class="gate-price" id="gatePrice">$499<span>/mo</span></div>
+      <div class="gate-sub" id="gateSub">Based on the features you selected, your stream fits the Starter plan. We'll have you live in under 48 hours.</div>
+
+      <div class="tier-reasons" id="tierReasons"></div>
+
+      <div class="config-summary" id="configSummary"></div>
+
+      <div class="gate-ctas">
+        <a id="gateEmailLink" href="mailto:Kyle@PilotCast.ai" class="btn-gate btn-gate-primary">Start My Free Pilot &#8594;</a>
+        <a href="/pilotcast.html#pricing" class="btn-gate btn-gate-secondary">Compare All Plans</a>
+      </div>
+      <div class="gate-note">Free 2-week pilot &middot; No credit card &middot; Kyle@PilotCast.ai</div>
+    </div>
+  </div>
+</div>
+
+</div></div>
+
+<script>
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+const state = {
+  step: 0,
+  niche: null,
+  hostName: '',
+  personality: null,
+  catchphrase: '',
+  channelName: '',
+  voice: null,
+  voiceTier: 'starter',
+  colorPrimary: '#6366f1',
+  colorAccent: '#f59e0b',
+  colorBg: '#0a0a2e',
+  theme: 'dark_grid',
+  themeTier: 'starter',
+  options: new Set() // tracks selected premium options
+};
+
+const TIERS = {
+  starter: { name: 'Starter', price: '$499', priceNum: 499, color: 'var(--tier-starter)' },
+  growth: { name: 'Growth', price: '$999', priceNum: 999, color: 'var(--tier-growth)' },
+  enterprise: { name: 'Enterprise', price: '$3,000+', priceNum: 3000, color: 'var(--tier-enterprise)' }
+};
+
+const TIER_ORDER = ['starter', 'growth', 'enterprise'];
+
+const TOTAL_STEPS = 5;
+
+// Option labels for the gate display
+const OPTION_LABELS = {
+  'data-enhanced': 'Enhanced Data Feeds',
+  'data-realtime': 'Real-Time Data Feeds',
+  'platform-dual': 'Dual Simulcast',
+  'platform-multi': 'Multi-Platform',
+  'host-priority': 'Priority Sub Queue',
+  'host-analytics': 'Weekly Analytics',
+  'host-takeover': 'Host Takeover Mode',
+  'host-custom-cmds': 'Custom Commands',
+  'voice-multilang': 'Multi-Language',
+  'voice-emotion': 'Reactive Tone',
+  'vis-avatar': 'AI Avatar',
+  'vis-logo': 'Custom Overlays',
+  'vis-dedicated': 'Dedicated Server',
+  'voice-clone': 'Voice Cloning',
+  'voice-custom': 'Custom Voice',
+  'theme-sunset': 'Sunset Theme',
+  'theme-ocean': 'Ocean Theme',
+  'theme-custom': 'Custom Theme'
+};
+
+// ════════════════════════════════════════
+// TIER CALCULATION
+// ════════════════════════════════════════
+function getRequiredTier() {
+  let max = 0; // starter
+  // Check voice
+  if (state.voiceTier === 'enterprise') max = 2;
+  else if (state.voiceTier === 'growth' && max < 1) max = 1;
+  // Check theme
+  if (state.themeTier === 'enterprise' && max < 2) max = 2;
+  else if (state.themeTier === 'growth' && max < 1) max = 1;
+  // Check options
+  state.options.forEach(opt => {
+    const card = document.querySelector(`[data-option="${opt}"]`);
+    if (card) {
+      const t = card.dataset.tier;
+      if (t === 'enterprise' && max < 2) max = 2;
+      if (t === 'growth' && max < 1) max = 1;
+    }
+  });
+  return TIER_ORDER[max];
+}
+
+function getUpgradeReasons() {
+  const reasons = [];
+  // Voice
+  if (state.voiceTier === 'enterprise') reasons.push({ label: state.voice === 'clone' ? 'Voice Cloning' : 'Custom Voice', tier: 'enterprise', type: 'voice' });
+  else if (state.voiceTier === 'growth') reasons.push({ label: 'Premium Voice', tier: 'growth', type: 'voice' });
+  // Theme
+  if (state.themeTier === 'enterprise') reasons.push({ label: 'Custom Theme', tier: 'enterprise', type: 'theme' });
+  else if (state.themeTier === 'growth') reasons.push({ label: OPTION_LABELS['theme-' + state.theme] || 'Premium Theme', tier: 'growth', type: 'theme' });
+  // Options
+  state.options.forEach(opt => {
+    const card = document.querySelector(`[data-option="${opt}"]`);
+    if (card && card.dataset.tier !== 'starter') {
+      reasons.push({ label: OPTION_LABELS[opt] || opt, tier: card.dataset.tier, type: 'option', option: opt });
+    }
+  });
+  return reasons;
+}
+
+function updateTierTracker() {
+  const tier = getRequiredTier();
+  const info = TIERS[tier];
+  const tracker = document.getElementById('tierTracker');
+  tracker.className = 'tier-tracker ' + tier;
+  document.getElementById('tierTrackerName').textContent = info.name;
+  document.getElementById('tierTrackerPrice').textContent = info.price + '/mo';
+}
+
+// ════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════
+function goToStep(n) {
+  if (n > state.step) return;
+  showStep(n);
+}
+
+function nextStep() {
+  if (state.step >= TOTAL_STEPS - 1) return;
+  state.step++;
+  showStep(state.step);
+}
+
+function prevStep() {
+  if (state.step <= 0) return;
+  state.step--;
+  showStep(state.step);
+}
+
+function showStep(n) {
+  state.step = n;
+  document.querySelectorAll('.step-panel').forEach((p, i) => p.classList.toggle('active', i === n));
+  document.querySelectorAll('.step-indicator').forEach((ind, i) => {
+    ind.classList.remove('active', 'done', 'locked');
+    if (i === n) ind.classList.add('active');
+    else if (i < n) ind.classList.add('done');
+    else ind.classList.add('locked');
+  });
+  const fill = document.getElementById('progressFill');
+  fill.style.height = `calc(${(n / (TOTAL_STEPS - 1)) * 100}% - 36px)`;
+  if (n === 4) renderPreview();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ════════════════════════════════════════
+// STEP HANDLERS
+// ════════════════════════════════════════
+function selectNiche(el) {
+  document.querySelectorAll('.niche-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.niche = el.dataset.niche;
+  document.getElementById('btn0').disabled = false;
+  document.getElementById('sub0').textContent = el.querySelector('.niche-name').textContent;
+  document.getElementById('sub0').style.color = 'var(--green)';
+  document.getElementById('dataOptions').style.display = 'block';
+}
+
+function selectChip(el) {
+  el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.personality = el.dataset.val;
+  updateHost();
+}
+
+function updateHost() {
+  state.hostName = document.getElementById('hostName').value.trim();
+  state.catchphrase = document.getElementById('catchphrase').value.trim();
+  state.channelName = document.getElementById('channelName').value.trim();
+  document.getElementById('btn1').disabled = !(state.hostName.length > 0 && state.personality);
+  if (state.hostName) {
+    document.getElementById('sub1').textContent = state.hostName;
+    document.getElementById('sub1').style.color = 'var(--green)';
+  }
+}
+
+function selectVoice(el) {
+  document.querySelectorAll('.voice-card').forEach(c => { c.classList.remove('selected', 'enterprise-sel'); });
+  el.classList.add('selected');
+  if (el.dataset.tier === 'enterprise') el.classList.add('enterprise-sel');
+  state.voice = el.dataset.voice;
+  state.voiceTier = el.dataset.tier || 'starter';
+  document.getElementById('btn2').disabled = false;
+  document.getElementById('sub2').textContent = el.querySelector('.voice-name').textContent.replace(/ENTERPRISE|GROWTH/g, '').trim();
+  document.getElementById('sub2').style.color = 'var(--green)';
+  updateTierTracker();
+}
+
+function selectTheme(el) {
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.theme = el.dataset.theme;
+  state.themeTier = el.dataset.tier || 'starter';
+  document.getElementById('sub3').textContent = el.querySelector('.theme-label').textContent.replace(/ENTERPRISE|GROWTH/g, '').trim();
+  document.getElementById('sub3').style.color = 'var(--green)';
+  updateTierTracker();
+}
+
+function toggleOption(el) {
+  if (el.classList.contains('included')) return;
+  const opt = el.dataset.option;
+  const prefix = opt.split('-')[0]; // e.g. "data" or "platform"
+  const wasSelected = el.classList.contains('selected');
+
+  // For data and platform: only one from each group (radio behavior)
+  if (['data', 'platform'].includes(prefix)) {
+    const group = el.closest('.option-grid');
+    group.querySelectorAll('.option-card:not(.included)').forEach(c => {
+      c.classList.remove('selected', 'growth-sel', 'enterprise-sel');
+      state.options.delete(c.dataset.option);
+    });
+    // If it was already selected, we just deselected it — done
+    if (wasSelected) { updateTierTracker(); return; }
+  }
+
+  el.classList.toggle('selected');
+  if (el.classList.contains('selected')) {
+    state.options.add(opt);
+    if (el.dataset.tier === 'growth') el.classList.add('growth-sel');
+    if (el.dataset.tier === 'enterprise') el.classList.add('enterprise-sel');
+  } else {
+    state.options.delete(opt);
+    el.classList.remove('growth-sel', 'enterprise-sel');
+  }
+  updateTierTracker();
+}
+
+function updateColors() {
+  state.colorPrimary = document.getElementById('colorPrimary').value;
+  state.colorAccent = document.getElementById('colorAccent').value;
+  state.colorBg = document.getElementById('colorBg').value;
+  document.getElementById('customThemePreview').style.background =
+    `linear-gradient(145deg, ${state.colorBg}, ${lighten(state.colorBg, 15)})`;
+}
+
+function lighten(hex, pct) {
+  let r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  r = Math.min(255, r + Math.round(pct*2.55));
+  g = Math.min(255, g + Math.round(pct*2.55));
+  b = Math.min(255, b + Math.round(pct*2.55));
+  return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+}
+
+// ════════════════════════════════════════
+// NICHE DATA
+// ════════════════════════════════════════
+const NICHE_DATA = {
+  finance: {
+    tickers: [{s:'NVDA',c:'+3.2%',d:'green'},{s:'BTC',c:'$98,420',d:'green'},{s:'SPY',c:'+0.4%',d:'green'}],
+    disclaimer: 'AI-generated commentary for education & entertainment only. Not financial advice.',
+    chat: [
+      {u:'@trader_mike',cmd:'!ask What\'s moving NVDA?',bot:'{H}: NVDA up 3.2% on data center guidance — AI infrastructure thesis keeps accelerating.'},
+      {u:'@crypto_jane',cmd:'!btc',bot:'{H}: Bitcoin at $98,420, up 1.8% in 24h. Testing the $100K resistance.'}
+    ]
+  },
+  sports: {
+    tickers: [{s:'NBA',c:'LAL 108',d:'green'},{s:'NFL',c:'Draft',d:'green'},{s:'MLB',c:'Spring',d:'green'}],
+    disclaimer: 'AI-generated sports commentary for entertainment. Scores may be delayed.',
+    chat: [
+      {u:'@hoops_fan',cmd:'!score LAL',bot:'{H}: Lakers lead 108-102 in the 4th. LeBron with 32 points.'},
+      {u:'@sports_guru',cmd:'!predict MVP',bot:'{H}: Based on current stats, the top 3 contenders are...'}
+    ]
+  },
+  space: {
+    tickers: [{s:'ISS',c:'408km',d:'green'},{s:'Mars',c:'225M km',d:'green'},{s:'Moon',c:'Waxing',d:'green'}],
+    disclaimer: 'AI-generated space commentary. Verify with NASA.gov.',
+    chat: [
+      {u:'@stargazer',cmd:'!whatif the sun disappeared',bot:'{H}: We\'d have 8 minutes of light left, then eternal darkness...'},
+      {u:'@astro_nerd',cmd:'!constellation Orion',bot:'{H}: Orion — the Hunter — one of the most recognizable...'}
+    ]
+  },
+  gaming: {
+    tickers: [{s:'League',c:'LCS W4',d:'green'},{s:'CS2',c:'Major',d:'green'},{s:'Valo',c:'S8',d:'green'}],
+    disclaimer: 'AI-powered gaming commentary. Stats may be delayed.',
+    chat: [
+      {u:'@gamer_one',cmd:'!stats Faker',bot:'{H}: Faker averaging 5.2 KDA this split, 73% win rate on Azir.'},
+      {u:'@esports_daily',cmd:'!predict T1 vs GenG',bot:'{H}: Close one — T1 has the talent edge but GenG\'s macro...'}
+    ]
+  },
+  news: {
+    tickers: [{s:'US',c:'Senate',d:'green'},{s:'Tech',c:'AI Bill',d:'green'},{s:'World',c:'G20',d:'green'}],
+    disclaimer: 'AI-generated news analysis. Verify from primary sources.',
+    chat: [
+      {u:'@news_junkie',cmd:'!breaking',bot:'{H}: Top story — Senate debating new AI regulation framework...'},
+      {u:'@citizen_press',cmd:'!explain tariffs',bot:'{H}: Tariffs are taxes on imports. Here\'s how they affect prices...'}
+    ]
+  },
+  custom: {
+    tickers: [{s:'LIVE',c:'24/7',d:'green'},{s:'Chat',c:'Active',d:'green'},{s:'Edu',c:'On',d:'green'}],
+    disclaimer: 'AI-generated content for education and entertainment.',
+    chat: [
+      {u:'@viewer1',cmd:'!ask Tell me something cool',bot:'{H}: Your stream is custom-built to cover exactly what your audience wants.'},
+      {u:'@new_sub',cmd:'!help',bot:'{H}: Here are the commands you can use...'}
+    ]
+  }
+};
+
+const THEME_BG = {
+  dark_grid: 'linear-gradient(145deg,#0a0a2e,#0f0f3a)',
+  nebula: 'radial-gradient(ellipse at 30% 50%,#1a0533,#080420,#03010d)',
+  matrix: 'linear-gradient(180deg,#001a00,#000d00)',
+  sunset: 'linear-gradient(160deg,#1a0a2e,#2d0a1e,#1a0505)',
+  ocean: 'linear-gradient(180deg,#0a1628,#051020,#020810)',
+  custom: null
+};
+
+// ════════════════════════════════════════
+// AVATAR RENDERER
+// ════════════════════════════════════════
+function renderAvatar(primary, accent, personality, niche) {
+  const avatar = document.getElementById('previewAvatar');
+  const svg = document.getElementById('avatarSvg');
+  const glow = document.getElementById('avatarGlow');
+  const ring = document.getElementById('avatarRing');
+
+  avatar.dataset.personality = personality;
+  avatar.style.color = primary;
+  glow.style.background = primary;
+  ring.style.color = primary;
+
+  // Base silhouette head + shoulders
+  const headY = 32;
+  const headR = 18;
+
+  // Personality affects the style details
+  const styles = {
+    energetic: { headR: 17, jawSharp: true, accents: 'bolts', bgGrad: true },
+    calm: { headR: 19, jawSharp: false, accents: 'waves', bgGrad: true },
+    witty: { headR: 17, jawSharp: true, accents: 'sparkle', bgGrad: false },
+    professional: { headR: 18, jawSharp: true, accents: 'lines', bgGrad: false },
+    hype: { headR: 16, jawSharp: true, accents: 'flames', bgGrad: true },
+    storyteller: { headR: 19, jawSharp: false, accents: 'stars', bgGrad: true }
+  };
+
+  const s = styles[personality] || styles.energetic;
+  const hr = s.headR;
+
+  // Niche affects background icon
+  const nicheIcons = {
+    finance: 'M30,75 L40,65 L50,70 L60,55 L70,60', // chart line
+    sports: '', // clean
+    space: 'circle', // orbital ring
+    gaming: '', // clean
+    news: '', // clean
+    custom: '' // clean
+  };
+
+  let svgContent = '';
+
+  // Background gradient fill
+  svgContent += `
+    <defs>
+      <radialGradient id="av-bg" cx="50%" cy="40%" r="60%">
+        <stop offset="0%" stop-color="${primary}" stop-opacity="0.15"/>
+        <stop offset="100%" stop-color="${primary}" stop-opacity="0.02"/>
+      </radialGradient>
+      <linearGradient id="av-body" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${primary}" stop-opacity="0.5"/>
+        <stop offset="100%" stop-color="${primary}" stop-opacity="0.15"/>
+      </linearGradient>
+      <linearGradient id="av-head" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${primary}" stop-opacity="0.6"/>
+        <stop offset="60%" stop-color="${primary}" stop-opacity="0.35"/>
+      </linearGradient>
+    </defs>
+    <rect width="100" height="100" fill="url(#av-bg)" rx="50"/>
+  `;
+
+  // Head
+  if (s.jawSharp) {
+    // Angular jaw
+    svgContent += `<path d="M${50-hr},${headY} 
+      A${hr},${hr} 0 1,1 ${50+hr},${headY}
+      L${50+hr-3},${headY+hr+4} 
+      Q50,${headY+hr+10} ${50-hr+3},${headY+hr+4} Z" 
+      fill="url(#av-head)"/>`;
+  } else {
+    // Soft round
+    svgContent += `<ellipse cx="50" cy="${headY+2}" rx="${hr}" ry="${hr+2}" fill="url(#av-head)"/>`;
+  }
+
+  // Eyes — subtle dots
+  const eyeY = headY - 1;
+  svgContent += `
+    <circle cx="${50-6}" cy="${eyeY}" r="1.8" fill="${primary}" opacity="0.8"/>
+    <circle cx="${50+6}" cy="${eyeY}" r="1.8" fill="${primary}" opacity="0.8"/>
+  `;
+
+  // Mouth — subtle
+  svgContent += `<path d="M${50-4},${headY+7} Q50,${headY+10} ${50+4},${headY+7}" fill="none" stroke="${primary}" stroke-width="1" opacity="0.4"/>`;
+
+  // Neck + shoulders
+  svgContent += `<path d="M${50-5},${headY+hr+3} L${50-5},62 Q${50-5},65 ${50-22},72 L${50-28},100 L${50+28},100 L${50+22},72 Q${50+5},65 ${50+5},62 L${50+5},${headY+hr+3}" fill="url(#av-body)"/>`;
+
+  // Personality accents
+  if (s.accents === 'bolts') {
+    // Lightning bolts beside head
+    svgContent += `<path d="M22,25 L26,30 L24,30 L28,38" fill="none" stroke="${accent}" stroke-width="1.5" opacity="0.6"/>`;
+    svgContent += `<path d="M78,25 L74,30 L76,30 L72,38" fill="none" stroke="${accent}" stroke-width="1.5" opacity="0.6"/>`;
+  } else if (s.accents === 'waves') {
+    // Gentle sound waves
+    svgContent += `<path d="M20,32 Q15,28 20,24" fill="none" stroke="${primary}" stroke-width="1" opacity="0.3"/>`;
+    svgContent += `<path d="M16,34 Q9,28 16,22" fill="none" stroke="${primary}" stroke-width="1" opacity="0.2"/>`;
+    svgContent += `<path d="M80,32 Q85,28 80,24" fill="none" stroke="${primary}" stroke-width="1" opacity="0.3"/>`;
+    svgContent += `<path d="M84,34 Q91,28 84,22" fill="none" stroke="${primary}" stroke-width="1" opacity="0.2"/>`;
+  } else if (s.accents === 'sparkle') {
+    // Sparkle dots
+    [{ x: 18, y: 20 }, { x: 82, y: 25 }, { x: 22, y: 48 }, { x: 78, y: 45 }].forEach(p => {
+      svgContent += `<circle cx="${p.x}" cy="${p.y}" r="1.2" fill="${accent}" opacity="0.6"/>`;
+      svgContent += `<line x1="${p.x-3}" y1="${p.y}" x2="${p.x+3}" y2="${p.y}" stroke="${accent}" stroke-width="0.5" opacity="0.4"/>`;
+      svgContent += `<line x1="${p.x}" y1="${p.y-3}" x2="${p.x}" y2="${p.y+3}" stroke="${accent}" stroke-width="0.5" opacity="0.4"/>`;
+    });
+  } else if (s.accents === 'lines') {
+    // Clean horizontal accents
+    svgContent += `<line x1="12" y1="70" x2="30" y2="70" stroke="${primary}" stroke-width="0.8" opacity="0.2"/>`;
+    svgContent += `<line x1="70" y1="70" x2="88" y2="70" stroke="${primary}" stroke-width="0.8" opacity="0.2"/>`;
+    svgContent += `<line x1="15" y1="74" x2="28" y2="74" stroke="${primary}" stroke-width="0.5" opacity="0.15"/>`;
+    svgContent += `<line x1="72" y1="74" x2="85" y2="74" stroke="${primary}" stroke-width="0.5" opacity="0.15"/>`;
+  } else if (s.accents === 'flames') {
+    // Flame shapes rising
+    svgContent += `<path d="M20,50 Q18,42 22,35 Q20,40 24,44 Q22,38 26,32 Q24,40 22,50Z" fill="${accent}" opacity="0.3"/>`;
+    svgContent += `<path d="M80,50 Q82,42 78,35 Q80,40 76,44 Q78,38 74,32 Q76,40 78,50Z" fill="${accent}" opacity="0.3"/>`;
+  } else if (s.accents === 'stars') {
+    // Small star shapes
+    [{ x: 15, y: 18 }, { x: 85, y: 22 }, { x: 12, y: 55 }, { x: 88, y: 50 }].forEach(p => {
+      svgContent += `<polygon points="${p.x},${p.y-3} ${p.x+1},${p.y-1} ${p.x+3},${p.y} ${p.x+1},${p.y+1} ${p.x},${p.y+3} ${p.x-1},${p.y+1} ${p.x-3},${p.y} ${p.x-1},${p.y-1}" fill="${accent}" opacity="0.5"/>`;
+    });
+  }
+
+  // Niche-specific subtle background detail
+  if (niche === 'finance') {
+    svgContent += `<polyline points="15,85 25,78 35,82 45,72 55,76 65,68 75,73 85,65" fill="none" stroke="${accent}" stroke-width="0.8" opacity="0.15"/>`;
+  } else if (niche === 'space') {
+    svgContent += `<ellipse cx="50" cy="32" rx="35" ry="8" fill="none" stroke="${primary}" stroke-width="0.5" opacity="0.1" transform="rotate(-20, 50, 32)"/>`;
+  }
+
+  svg.innerHTML = svgContent;
+}
+
+// ════════════════════════════════════════
+// RENDER PREVIEW
+// ════════════════════════════════════════
+function renderPreview() {
+  const niche = NICHE_DATA[state.niche] || NICHE_DATA.custom;
+  const hostName = state.hostName || 'Your Host';
+  const channelName = state.channelName || 'Your Channel';
+  const primary = state.colorPrimary;
+  const accent = state.colorAccent;
+  const tier = getRequiredTier();
+  const tierInfo = TIERS[tier];
+
+  // Background
+  const bg = document.getElementById('previewBg');
+  bg.style.background = state.theme === 'custom'
+    ? `linear-gradient(145deg, ${state.colorBg}, ${lighten(state.colorBg, 10)})`
+    : THEME_BG[state.theme];
+
+  // Names
+  document.getElementById('previewHostName').textContent = hostName;
+  document.getElementById('previewHostName').style.color = primary;
+  document.getElementById('previewChannelName').textContent = channelName;
+
+  // Avatar
+  renderAvatar(primary, accent, state.personality || 'energetic', state.niche || 'custom');
+
+  // Speaking badge
+  const sb = document.getElementById('previewSpeaking');
+  sb.style.background = primary + '22';
+  sb.style.color = primary;
+  document.getElementById('previewSpeakingText').textContent = hostName.toUpperCase() + ' SPEAKING';
+
+  // Tickers
+  document.getElementById('previewTickers').innerHTML = niche.tickers.map(t =>
+    `<div class="preview-ticker"><span style="color:${accent}">${t.s}</span> <span class="${t.d}">${t.c}</span></div>`
+  ).join('');
+
+  document.getElementById('previewDisclaimer').textContent = niche.disclaimer;
+
+  // Chat
+  const chatEl = document.getElementById('previewChat');
+  chatEl.innerHTML = '';
+  niche.chat.forEach((m, i) => {
+    const bot = m.bot.replace('{H}', hostName);
+    chatEl.innerHTML += `<div class="pchat-msg" style="animation-delay:${0.5+i*1.8}s"><span style="color:${primary};font-weight:600">${m.u}</span> <span style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:0.75rem">${m.cmd}</span></div>`;
+    chatEl.innerHTML += `<div class="pchat-msg" style="animation-delay:${1.2+i*1.8}s"><span style="color:${accent};font-weight:600">${hostName}:</span> ${bot.split(': ').slice(1).join(': ')}</div>`;
+  });
+
+  // Particles
+  const pe = document.getElementById('previewParticles');
+  pe.innerHTML = '';
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random()*100+'%';
+    p.style.animationDuration = (4+Math.random()*6)+'s';
+    p.style.animationDelay = Math.random()*5+'s';
+    p.style.background = i%3===0 ? accent : primary;
+    pe.appendChild(p);
+  }
+
+  // ── GATE ──
+  const badge = document.getElementById('gateTierBadge');
+  badge.className = 'gate-tier-display ' + tier;
+  badge.textContent = tierInfo.name.toUpperCase() + ' PLAN';
+
+  document.getElementById('gatePrice').innerHTML = tierInfo.price + '<span>/mo</span>';
+
+  if (tier === 'starter') {
+    document.getElementById('gateTitle').textContent = 'Your stream is ready.';
+    document.getElementById('gateSub').textContent = `${hostName} is configured and ready to go live. We'll deploy in under 48 hours.`;
+  } else if (tier === 'growth') {
+    document.getElementById('gateTitle').textContent = 'You\'ve built a Growth stream.';
+    document.getElementById('gateSub').innerHTML = `The features you picked put you in the <strong>Growth</strong> tier. Here's what's driving that:`;
+  } else {
+    document.getElementById('gateTitle').textContent = 'You\'re going Enterprise.';
+    document.getElementById('gateSub').innerHTML = `You've selected premium features that require the <strong>Enterprise</strong> tier. Here's the breakdown:`;
+  }
+
+  // Tier reasons
+  const reasons = getUpgradeReasons();
+  const reasonsEl = document.getElementById('tierReasons');
+  if (reasons.length > 0 && tier !== 'starter') {
+    reasonsEl.innerHTML = reasons.map(r =>
+      `<div class="tier-reason"><span class="tier-badge ${r.tier}">${r.tier.toUpperCase()}</span> ${r.label}</div>`
+    ).join('');
+    reasonsEl.style.display = 'flex';
+  } else {
+    reasonsEl.style.display = 'none';
+  }
+
+  // Config summary
+  const personalityLabel = state.personality ? state.personality.charAt(0).toUpperCase() + state.personality.slice(1) : '—';
+  const voiceLabel = state.voice ? (state.voice === 'clone' ? 'Voice Clone' : state.voice.charAt(0).toUpperCase() + state.voice.slice(1)) : '—';
+  const nicheLabel = state.niche ? state.niche.charAt(0).toUpperCase() + state.niche.slice(1) : '—';
+  document.getElementById('configSummary').innerHTML = `
+    <div class="config-item"><span class="config-item-label">Niche:</span><span class="config-item-value">${nicheLabel}</span></div>
+    <div class="config-item"><span class="config-item-label">Host:</span><span class="config-item-value">${hostName}</span></div>
+    <div class="config-item"><span class="config-item-label">Voice:</span><span class="config-item-value">${voiceLabel}</span></div>
+    <div class="config-item"><span class="config-item-label">Style:</span><span class="config-item-value">${personalityLabel}</span></div>
+    <div class="config-item"><span class="config-item-label">Theme:</span><span class="config-item-value">${state.theme.replace('_',' ')}</span></div>
+    <div class="config-item"><span class="config-item-label">Channel:</span><span class="config-item-value">${channelName||'—'}</span></div>
+  `;
+
+  // Voice map (configurator name → Edge-TTS voice string)
+  const VOICE_MAP = {
+    jenny: 'en-US-JennyNeural',
+    guy: 'en-US-GuyNeural',
+    aria: 'en-US-AriaNeural',
+    davis: 'en-US-DavisNeural',
+    clone: 'VOICE_CLONE_REQUESTED',
+    custom: 'CUSTOM_VOICE_REQUESTED'
+  };
+
+  // Build config-structured email body
+  const voiceString = VOICE_MAP[state.voice] || 'en-US-JennyNeural';
+  const catchLine = state.catchphrase || '(Kyle will create catchphrases)';
+  const selectedAddons = reasons.map(r => '  - ' + r.label).join('\n') || '  (none)';
+
+  const subject = encodeURIComponent(`PilotCast — ${channelName || 'New Stream'} (${tierInfo.name})`);
+  const body = encodeURIComponent(
+`Hey Kyle,
+
+I just configured my stream on PilotCast. Here's everything:
+
+── CONFIG ──────────────────────────────
+client_name: "${(channelName || 'mychannel').toLowerCase().replace(/[^a-z0-9]/g, '')}"
+channel_name: "${channelName || '(to be decided)'}"
+
+host_name: "${hostName}"
+host_voice: "${voiceString}"
+host_personality: "${personalityLabel.toLowerCase()}"
+host_catchphrase: "${catchLine}"
+
+niche: "${nicheLabel.toLowerCase()}"
+theme: "${state.theme}"
+primary_color: "${state.colorPrimary}"
+accent_color: "${state.colorAccent}"
+background_color: "${state.colorBg}"
+
+plan: ${tierInfo.name} (${tierInfo.price}/mo)
+
+premium_features:
+${selectedAddons}
+────────────────────────────────────────
+
+Let's make it happen!`
+  );
+  document.getElementById('gateEmailLink').href = `mailto:Kyle@PilotCast.ai?subject=${subject}&body=${body}`;
+
+  document.getElementById('sub4').textContent = tierInfo.name + ' — ' + tierInfo.price + '/mo';
+  document.getElementById('sub4').style.color = 'var(--green)';
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => showStep(0));
+</script>
+</body>
+</html>

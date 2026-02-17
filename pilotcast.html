@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PilotCast AI &mdash; 24/7 AI-Powered Livestreams</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #04060e;
+  --bg-card: #0a0e1a;
+  --bg-card-hover: #0f1424;
+  --border: #1a1f35;
+  --border-glow: #2a3050;
+  --text: #e8eaf0;
+  --text-dim: #7a82a0;
+  --text-muted: #4a5070;
+  --accent: #6366f1;
+  --accent-bright: #818cf8;
+  --accent2: #f59e0b;
+  --accent2-dim: #d97706;
+  --green: #22c55e;
+  --red: #ef4444;
+  --gradient-1: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+  --gradient-2: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* â”€â”€ NAV â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+nav {
+  position: fixed; top: 0; width: 100%; z-index: 100;
+  padding: 1.2rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  backdrop-filter: blur(20px);
+  background: rgba(4, 6, 14, 0.7);
+  border-bottom: 1px solid var(--border);
+}
+.logo { font-weight: 800; font-size: 1.4rem; letter-spacing: -0.03em; }
+.logo span { color: var(--accent-bright); }
+.nav-links { display: flex; gap: 2rem; align-items: center; }
+.nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
+.nav-links a:hover { color: var(--text); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.7rem 1.6rem; border-radius: 8px;
+  font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 0.9rem;
+  text-decoration: none; cursor: pointer; border: none; transition: all 0.3s ease;
+}
+.btn-primary { background: var(--gradient-1); color: white; box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(99, 102, 241, 0.5); }
+.btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border-glow); }
+.btn-secondary:hover { border-color: var(--accent); background: rgba(99, 102, 241, 0.05); }
+.btn-urgent { background: var(--gradient-2); color: white; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3); }
+.btn-urgent:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(245, 158, 11, 0.5); }
+
+/* â”€â”€ HERO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column;
+  justify-content: center; align-items: center; text-align: center;
+  padding: 8rem 2rem 4rem; position: relative;
+}
+.hero::before {
+  content: ''; position: absolute; top: 10%; left: 50%; transform: translateX(-50%);
+  width: 800px; height: 600px;
+  background: radial-gradient(ellipse, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.05) 40%, transparent 70%);
+  pointer-events: none; animation: pulse-glow 6s ease-in-out infinite alternate;
+}
+@keyframes pulse-glow {
+  0% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+  100% { opacity: 1; transform: translateX(-50%) scale(1.1); }
+}
+
+.badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.4rem 1rem; border-radius: 50px;
+  border: 1px solid var(--border-glow); background: rgba(99, 102, 241, 0.06);
+  font-size: 0.8rem; color: var(--accent-bright); font-weight: 500;
+  margin-bottom: 2rem; animation: fade-in-up 0.6s ease both;
+}
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: blink 2s infinite; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+h1 {
+  font-size: clamp(3rem, 7vw, 5.5rem); font-weight: 800;
+  letter-spacing: -0.04em; line-height: 1.05; margin-bottom: 1.5rem;
+  animation: fade-in-up 0.6s ease 0.1s both;
+}
+h1 .gradient { background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+.hero-sub { font-size: 1.25rem; color: var(--text-dim); max-width: 600px; line-height: 1.6; margin-bottom: 2.5rem; font-weight: 400; animation: fade-in-up 0.6s ease 0.2s both; }
+.hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; animation: fade-in-up 0.6s ease 0.3s both; }
+
+@keyframes fade-in-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* â”€â”€ LIVE DEMO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.demo-section { padding: 2rem 2rem 6rem; display: flex; justify-content: center; }
+.demo-window {
+  width: 100%; max-width: 960px; border-radius: 16px;
+  border: 1px solid var(--border); overflow: hidden; background: var(--bg-card);
+  box-shadow: 0 40px 80px rgba(0,0,0,0.4), 0 0 120px rgba(99, 102, 241, 0.06);
+  animation: fade-in-up 0.8s ease 0.5s both;
+}
+.demo-titlebar { display: flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1rem; background: rgba(10, 14, 26, 0.8); border-bottom: 1px solid var(--border); }
+.demo-dot { width: 10px; height: 10px; border-radius: 50%; }
+.demo-dot:nth-child(1) { background: #ef4444; }
+.demo-dot:nth-child(2) { background: #f59e0b; }
+.demo-dot:nth-child(3) { background: #22c55e; }
+.demo-titlebar span { margin-left: 0.5rem; color: var(--text-muted); font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; }
+.demo-content { padding: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; min-height: 340px; }
+
+.demo-stream {
+  background: linear-gradient(145deg, #0a0a2e, #0f0f3a); border-radius: 10px;
+  padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;
+  position: relative; overflow: hidden;
+}
+.demo-stream::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 30% 40%, rgba(99,102,241,0.15), transparent 60%); }
+.demo-live-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.6rem; border-radius: 4px; background: #ef4444; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em; width: fit-content; position: relative; z-index: 1; }
+.demo-channel { position: relative; z-index: 1; }
+.demo-channel h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.3rem; }
+.demo-channel p { font-size: 0.75rem; color: var(--text-dim); }
+.demo-stats { position: relative; z-index: 1; display: flex; gap: 1rem; }
+.demo-stat { padding: 0.4rem 0.7rem; background: rgba(255,255,255,0.05); border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--accent-bright); }
+
+.demo-chat { display: flex; flex-direction: column; gap: 0.6rem; justify-content: center; }
+.chat-msg { padding: 0.6rem 0.8rem; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.04); font-size: 0.8rem; opacity: 0; animation: chat-in 0.4s ease forwards; }
+.chat-msg:nth-child(1) { animation-delay: 1s; }
+.chat-msg:nth-child(2) { animation-delay: 2.5s; }
+.chat-msg:nth-child(3) { animation-delay: 4s; }
+.chat-msg:nth-child(4) { animation-delay: 5.5s; }
+.chat-msg:nth-child(5) { animation-delay: 7s; }
+@keyframes chat-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.chat-user { color: var(--accent-bright); font-weight: 600; }
+.chat-bot { color: var(--accent2); font-weight: 600; }
+.chat-cmd { color: var(--green); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
+
+/* â”€â”€ SECTIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+section { padding: 6rem 2rem; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+.section-label { color: var(--accent-bright); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.8rem; }
+.section-title { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 1rem; }
+.section-sub { color: var(--text-dim); font-size: 1.05rem; max-width: 600px; line-height: 1.6; margin-bottom: 3rem; }
+
+/* â”€â”€ SOCIAL PROOF â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.proof-bar { display: flex; justify-content: center; gap: 4rem; padding: 3rem 2rem; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.proof-stat { text-align: center; }
+.proof-stat .num { font-size: 2rem; font-weight: 800; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.proof-stat .label { color: var(--text-dim); font-size: 0.8rem; margin-top: 0.2rem; }
+
+/* â”€â”€ STEPS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.step-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 2rem; transition: all 0.3s ease; position: relative; }
+.step-card:hover { border-color: var(--accent); background: var(--bg-card-hover); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+.step-num { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 500; color: var(--accent); background: rgba(99, 102, 241, 0.1); padding: 0.3rem 0.6rem; border-radius: 6px; display: inline-block; margin-bottom: 1rem; }
+.step-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.6rem; }
+.step-card p { color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; }
+
+/* â”€â”€ FEATURES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.2rem; }
+.feature { display: flex; gap: 1rem; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-card); transition: all 0.2s; }
+.feature:hover { border-color: var(--border-glow); background: var(--bg-card-hover); }
+.feature-icon { width: 42px; height: 42px; border-radius: 10px; background: rgba(99, 102, 241, 0.1); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+.feature h4 { font-size: 1rem; font-weight: 600; margin-bottom: 0.3rem; }
+.feature p { color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; }
+
+/* â”€â”€ ROI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.roi-section { background: linear-gradient(180deg, var(--bg) 0%, #080c18 100%); }
+.roi-box { max-width: 700px; margin: 0 auto; background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; }
+.roi-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.roi-row label { font-size: 0.95rem; font-weight: 500; }
+.roi-slider { -webkit-appearance: none; width: 280px; height: 6px; border-radius: 3px; background: var(--border); outline: none; }
+.roi-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 12px rgba(99,102,241,0.4); }
+.roi-value { font-family: 'JetBrains Mono', monospace; font-size: 1rem; color: var(--accent-bright); min-width: 80px; text-align: right; }
+.roi-result { margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; }
+.roi-result .big-num { font-size: 3rem; font-weight: 800; background: var(--gradient-2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.roi-result p { color: var(--text-dim); margin-top: 0.3rem; font-size: 0.9rem; }
+.roi-vs { margin-top: 1rem; font-size: 0.85rem; color: var(--green); font-weight: 600; }
+
+/* â”€â”€ PRICING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.price-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem 2rem; display: flex; flex-direction: column; transition: all 0.3s; }
+.price-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+.price-card.featured { border-color: var(--accent); box-shadow: 0 0 40px rgba(99,102,241,0.1); position: relative; }
+.price-card.featured::before { content: 'MOST POPULAR'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--gradient-1); color: white; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; padding: 0.3rem 1rem; border-radius: 50px; }
+.price-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.3rem; }
+.price-desc { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 1.5rem; }
+.price-amount { font-size: 2.5rem; font-weight: 800; margin-bottom: 0.2rem; }
+.price-amount span { font-size: 0.9rem; font-weight: 400; color: var(--text-dim); }
+.price-period { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 2rem; }
+.price-features { list-style: none; flex: 1; margin-bottom: 2rem; }
+.price-features li { padding: 0.5rem 0; font-size: 0.85rem; color: var(--text-dim); display: flex; align-items: flex-start; gap: 0.6rem; }
+.price-features li::before { content: '\2713'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+.price-features li.excluded::before { content: '\2717'; color: var(--text-muted); }
+.price-features li.excluded { color: var(--text-muted); }
+.price-card .btn { width: 100%; justify-content: center; }
+
+/* â”€â”€ URGENCY BANNER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.urgency-banner {
+  max-width: 700px; margin: 0 auto 2rem;
+  padding: 1.5rem 2rem; border-radius: 12px;
+  border: 1px solid var(--accent2); background: rgba(245,158,11,0.06);
+  text-align: center; position: relative; overflow: hidden;
+}
+.urgency-banner::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(245,158,11,0.03), transparent);
+  animation: urgency-shimmer 3s ease infinite;
+}
+@keyframes urgency-shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+.urgency-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; color: var(--accent2); margin-bottom: 0.5rem; position: relative; }
+.urgency-title { font-size: 1.4rem; font-weight: 800; color: var(--text); margin-bottom: 0.5rem; position: relative; }
+.urgency-sub { color: var(--text-dim); font-size: 0.9rem; position: relative; }
+.spots-count { color: var(--red); font-weight: 800; font-size: 1.6rem; }
+
+/* â”€â”€ CTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+.cta-section { padding: 6rem 2rem; text-align: center; position: relative; }
+.cta-section::before { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 600px; height: 400px; background: radial-gradient(ellipse, rgba(99, 102, 241, 0.08), transparent 70%); pointer-events: none; }
+.cta-section h2 { font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 1rem; }
+.cta-section p { color: var(--text-dim); font-size: 1.1rem; margin-bottom: 2rem; }
+.cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+/* â”€â”€ FOOTER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+footer { padding: 3rem 2rem; border-top: 1px solid var(--border); text-align: center; }
+footer p { color: var(--text-muted); font-size: 0.8rem; }
+footer a { color: var(--text-dim); text-decoration: none; }
+footer a:hover { color: var(--text); }
+
+/* â”€â”€ RESPONSIVE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+@media (max-width: 768px) {
+  .steps-grid, .features-grid, .pricing-grid { grid-template-columns: 1fr; }
+  .demo-content { grid-template-columns: 1fr; }
+  .nav-links a:not(.btn) { display: none; }
+  .roi-row { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+  .roi-slider { width: 100%; }
+  .proof-bar { gap: 2rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Pilot<span>Cast</span> AI</div>
+  <div class="nav-links">
+    <a href="#how-it-works">How It Works</a>
+    <a href="#features">Features</a>
+    <a href="#pricing">Pricing</a>
+    <a href="/configure.html" class="btn btn-primary">Get Started</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="badge">
+    <div class="badge-dot"></div>
+    Live streams running right now
+  </div>
+  <h1>Your channel.<br><span class="gradient">Never sleeps.</span></h1>
+  <p class="hero-sub">
+    PilotCast AI builds and runs 24/7 livestreams with custom AI hosts,
+    real-time data, interactive chat, and zero manual effort.
+    Stream to YouTube, Twitch, Kick &mdash; or all of them at once.
+  </p>
+  <div class="hero-ctas">
+    <a href="/configure.html" class="btn btn-primary">Build Your Stream &#8594;</a>
+    <a href="#how-it-works" class="btn btn-secondary">See How It Works</a>
+  </div>
+</section>
+
+<!-- DEMO -->
+<div class="demo-section">
+  <div class="demo-window" style="max-width: 900px; margin: 0 auto; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 120px rgba(74,144,217,0.06);">
+    <div class="demo-titlebar">
+      <div class="demo-dot"></div>
+      <div class="demo-dot"></div>
+      <div class="demo-dot"></div>
+      <span>youtube.com/live</span>
+    </div>
+    <div style="aspect-ratio: 16/9; position: relative; overflow: hidden; background: linear-gradient(145deg, #0a0a2e, #0f0f3a);">
+      <!-- Grid -->
+      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:40px 40px;"></div>
+      <!-- Overlay -->
+      <div style="position:absolute;inset:0;padding:1.5rem;display:flex;flex-direction:column;justify-content:space-between;z-index:2;">
+        <!-- Top -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div style="display:inline-flex;align-items:center;gap:0.35rem;padding:0.25rem 0.65rem;border-radius:4px;background:#ef4444;font-size:0.6rem;font-weight:700;letter-spacing:0.06em;">
+            <div style="width:6px;height:6px;border-radius:50%;background:white;animation:blink 1.5s infinite;"></div> LIVE
+          </div>
+          <div style="font-size:0.65rem;color:rgba(255,255,255,0.6);font-family:monospace;">&#128101; 247 watching</div>
+        </div>
+        <!-- Center -->
+        <div style="text-align:center;">
+          <div style="font-size:1.6rem;font-weight:800;letter-spacing:-0.02em;text-shadow:0 2px 20px rgba(0,0,0,0.5);color:#4A90D9;margin-bottom:0.3rem;">Estrong</div>
+          <div style="font-size:0.85rem;font-weight:500;opacity:0.7;">Rich Mentality</div>
+          <div style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.7rem;font-weight:700;letter-spacing:0.06em;margin-top:0.6rem;background:rgba(74,144,217,0.15);color:#4A90D9;">
+            <svg width="16" height="12" viewBox="0 0 16 12"><rect x="0" y="4" width="2" height="4" rx="1" fill="currentColor" opacity="0.7"><animate attributeName="height" values="4;8;4" dur="0.8s" repeatCount="indefinite"/><animate attributeName="y" values="4;2;4" dur="0.8s" repeatCount="indefinite"/></rect><rect x="4" y="2" width="2" height="8" rx="1" fill="currentColor" opacity="0.8"><animate attributeName="height" values="8;4;8" dur="0.6s" repeatCount="indefinite"/><animate attributeName="y" values="2;4;2" dur="0.6s" repeatCount="indefinite"/></rect><rect x="8" y="3" width="2" height="6" rx="1" fill="currentColor" opacity="0.7"><animate attributeName="height" values="6;10;6" dur="0.7s" repeatCount="indefinite"/><animate attributeName="y" values="3;1;3" dur="0.7s" repeatCount="indefinite"/></rect><rect x="12" y="1" width="2" height="10" rx="1" fill="currentColor" opacity="0.9"><animate attributeName="height" values="10;4;10" dur="0.5s" repeatCount="indefinite"/><animate attributeName="y" values="1;4;1" dur="0.5s" repeatCount="indefinite"/></rect></svg>
+            ESTRONG SPEAKING
+          </div>
+        </div>
+        <!-- Bottom -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+          <div style="display:flex;gap:0.5rem;">
+            <div style="padding:0.3rem 0.6rem;border-radius:6px;background:rgba(0,0,0,0.4);backdrop-filter:blur(8px);font-family:monospace;font-size:0.65rem;font-weight:500;border:1px solid rgba(255,255,255,0.06);"><span style="color:#FFD700">NVDA</span> <span style="color:#22c55e">+3.2%</span></div>
+            <div style="padding:0.3rem 0.6rem;border-radius:6px;background:rgba(0,0,0,0.4);backdrop-filter:blur(8px);font-family:monospace;font-size:0.65rem;font-weight:500;border:1px solid rgba(255,255,255,0.06);"><span style="color:#FFD700">BTC</span> <span style="color:#22c55e">$98,420</span></div>
+            <div style="padding:0.3rem 0.6rem;border-radius:6px;background:rgba(0,0,0,0.4);backdrop-filter:blur(8px);font-family:monospace;font-size:0.65rem;font-weight:500;border:1px solid rgba(255,255,255,0.06);"><span style="color:#FFD700">SPY</span> <span style="color:#22c55e">+0.4%</span></div>
+          </div>
+          <div style="font-size:0.45rem;color:rgba(255,255,255,0.2);max-width:250px;text-align:right;line-height:1.4;">AI-generated commentary for education &amp; entertainment only. Not financial advice.</div>
+        </div>
+      </div>
+    </div>
+    <!-- Chat -->
+    <div style="padding:1rem 1.5rem;border-top:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;gap:0.5rem;background:rgba(10,14,26,0.9);">
+      <div style="font-size:0.8rem;"><span style="color:#4A90D9;font-weight:600;">@trader_mike</span> <span style="color:#22c55e;font-family:monospace;font-size:0.75rem;">!ask What's moving NVDA?</span></div>
+      <div style="font-size:0.8rem;"><span style="color:#FFD700;font-weight:600;">Estrong:</span> NVDA up 3.2% on strong data center guidance &mdash; AI infrastructure thesis keeps accelerating.</div>
+      <div style="font-size:0.8rem;"><span style="color:#4A90D9;font-weight:600;">@crypto_jane</span> <span style="color:#22c55e;font-family:monospace;font-size:0.75rem;">!btc</span></div>
+      <div style="font-size:0.8rem;"><span style="color:#FFD700;font-weight:600;">Estrong:</span> Bitcoin at $98,420, up 1.8% in 24h. Testing the $100K resistance.</div>
+    </div>
+  </div>
+  <p style="text-align:center;margin-top:1.5rem;color:rgba(255,255,255,0.3);font-size:0.85rem;">&#9650; Rich Mentality &mdash; live right now on YouTube. <a href="/configure.html" style="color:#4A90D9;text-decoration:underline;">Build yours &#8594;</a></p>
+</div>
+
+<!-- SOCIAL PROOF BAR -->
+<div class="proof-bar">
+  <div class="proof-stat">
+    <div class="num">24/7</div>
+    <div class="label">Always Live</div>
+  </div>
+  <div class="proof-stat">
+    <div class="num">&#8734;</div>
+    <div class="label">Unlimited Chat Commands</div>
+  </div>
+  <div class="proof-stat">
+    <div class="num">HD</div>
+    <div class="label">Broadcast Quality</div>
+  </div>
+  <div class="proof-stat">
+    <div class="num">Multi</div>
+    <div class="label">Platform Streaming</div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works">
+  <div class="section-inner">
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title">Three steps to a 24/7 AI stream</h2>
+    <p class="section-sub">We handle the tech. You own the brand.</p>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <h3>Pick Your Niche</h3>
+        <p>Finance, crypto, space, sports, news &mdash; any topic with an audience. We build the data pipeline and content engine around it.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <h3>Design Your AI Host</h3>
+        <p>Name, personality, voice, catchphrases, avatar. Your host speaks your brand's language and engages your community 24/7.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <h3>Go Live</h3>
+        <p>We deploy to YouTube, Twitch, Kick &mdash; wherever your audience is. Your AI host streams real-time data, answers chat questions, and never takes a break.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-inner">
+    <div class="section-label">Features</div>
+    <h2 class="section-title">Everything your stream needs</h2>
+    <p class="section-sub">Built from real production streams, not theory.</p>
+    <div class="features-grid">
+      <div class="feature">
+        <div class="feature-icon">&#129302;</div>
+        <div>
+          <h4>Custom AI Host</h4>
+          <p>Unique name, voice, personality, and catchphrases. Powered by LLMs with guardrails to stay on-brand. Voice cloning available.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">&#128172;</div>
+        <div>
+          <h4>Unlimited Chat Commands</h4>
+          <p>Fully customizable command system. Your audience asks questions and gets real-time voice answers. Add as many commands as your niche needs.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">&#128200;</div>
+        <div>
+          <h4>Real-Time Data Feeds</h4>
+          <p>Stocks, crypto, forex, sports scores, space data &mdash; whatever your niche needs, updating live. Scale your data with additional API capacity for faster, richer feeds.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">&#127912;</div>
+        <div>
+          <h4>Branded Visuals</h4>
+          <p>Custom themes, animated backgrounds, avatar system, and dynamic color schemes that match your brand identity.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">&#127891;</div>
+        <div>
+          <h4>Education Engine</h4>
+          <p>Automated deep-dive segments teach your audience between updates. Keeps viewers engaged, learning, and coming back.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">&#128247;</div>
+        <div>
+          <h4>Multi-Platform Streaming</h4>
+          <p>Stream to YouTube, Twitch, Kick, or any RTMP-compatible service. Simulcast to multiple platforms at once for maximum reach.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">&#9889;</div>
+        <div>
+          <h4>Premium Data Add-Ons</h4>
+          <p>Need faster refresh rates? More data sources? Real-time alerts? Scale your data capacity on demand &mdash; pay for exactly what you need.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">&#128274;</div>
+        <div>
+          <h4>Compliance Built In</h4>
+          <p>Disclaimers always visible. AI never gives personalized advice. FTC-aware content generation for regulated niches.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- DATA & API SCALING -->
+<section style="padding: 4rem 2rem;">
+  <div class="section-inner" style="text-align: center;">
+    <div class="section-label">Scale Your Data</div>
+    <h2 class="section-title">Need more? Just upgrade your feeds.</h2>
+    <p class="section-sub" style="margin: 0 auto 2rem;">Every plan includes standard data. Need faster refresh rates, premium sources, or real-time alerts? Add data capacity on demand.</p>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: 800px; margin: 0 auto;">
+      <div style="padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-card);">
+        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">&#9201;</div>
+        <div style="font-weight: 700; margin-bottom: 0.3rem;">Standard</div>
+        <div style="color: var(--text-dim); font-size: 0.85rem;">Data updates every 15-30s. Included in all plans.</div>
+      </div>
+      <div style="padding: 1.5rem; border-radius: 12px; border: 1px solid var(--accent); background: var(--bg-card);">
+        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">&#9889;</div>
+        <div style="font-weight: 700; margin-bottom: 0.3rem;">Enhanced</div>
+        <div style="color: var(--text-dim); font-size: 0.85rem;">5-10s refresh. More data sources. Priority alerts. +$199/mo</div>
+      </div>
+      <div style="padding: 1.5rem; border-radius: 12px; border: 1px solid var(--accent2); background: var(--bg-card);">
+        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">&#128640;</div>
+        <div style="font-weight: 700; margin-bottom: 0.3rem;">Real-Time</div>
+        <div style="color: var(--text-dim); font-size: 0.85rem;">Sub-second feeds. Premium APIs. Custom integrations. Custom pricing</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROI CALCULATOR -->
+<section class="roi-section" id="roi">
+  <div class="section-inner">
+    <div class="section-label">ROI Calculator</div>
+    <h2 class="section-title">What's a 24/7 stream worth?</h2>
+    <p class="section-sub">Estimate the value of always-on content for your brand.</p>
+    <div class="roi-box">
+      <div class="roi-row">
+        <label>Average concurrent viewers</label>
+        <input type="range" class="roi-slider" id="viewers" min="10" max="5000" value="150" step="10">
+        <div class="roi-value" id="viewers-val">150</div>
+      </div>
+      <div class="roi-row">
+        <label>CPM (ad revenue per 1K views)</label>
+        <input type="range" class="roi-slider" id="cpm" min="1" max="30" value="7">
+        <div class="roi-value" id="cpm-val">$7</div>
+      </div>
+      <div class="roi-row">
+        <label>Sponsor mentions per day</label>
+        <input type="range" class="roi-slider" id="sponsors" min="0" max="20" value="3">
+        <div class="roi-value" id="sponsors-val">3</div>
+      </div>
+      <div class="roi-result">
+        <div class="big-num" id="roi-total">$0</div>
+        <p>Estimated monthly revenue</p>
+        <div class="roi-vs" id="roi-vs"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-inner">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">Plans that scale with you</h2>
+    <p class="section-sub">Every plan includes a free 2-week pilot. No risk.</p>
+    <div class="pricing-grid" style="grid-template-columns: repeat(3, 1fr); max-width: 1000px; margin: 0 auto;">
+      <div class="price-card">
+        <h3>Starter</h3>
+        <p class="price-desc">Everything you need to go live 24/7.</p>
+        <div class="price-amount">$499<span>/mo</span></div>
+        <p class="price-period">Get streaming fast</p>
+        <ul class="price-features">
+          <li>Custom AI host (name, voice, personality)</li>
+          <li>15 chat commands</li>
+          <li>Standard data feeds (15&ndash;30s)</li>
+          <li>Single platform (YouTube, Twitch, or Kick)</li>
+          <li>3 visual themes</li>
+          <li>Server hosting included</li>
+          <li>Edge-TTS (6 voices)</li>
+          <li>Email support</li>
+        </ul>
+        <a href="/configure.html" class="btn btn-secondary">Build Your Stream &#8594;</a>
+      </div>
+      <div class="price-card featured">
+        <h3>Growth</h3>
+        <p class="price-desc">We build it. We host it. We run it. You brand it.</p>
+        <div class="price-amount">$999<span>/mo</span></div>
+        <p class="price-period">Most popular</p>
+        <ul class="price-features">
+          <li>Everything in Starter</li>
+          <li>Enhanced data feeds (5&ndash;10s)</li>
+          <li>Dual simulcast (2 platforms)</li>
+          <li>Subscriber priority queue</li>
+          <li>Weekly analytics report</li>
+          <li>AI avatar on stream</li>
+          <li>Multi-language host</li>
+          <li>6 premium themes</li>
+          <li>24/7 monitoring + auto-restart</li>
+          <li>Slack or Teams support</li>
+        </ul>
+        <a href="/configure.html" class="btn btn-primary">Start Free Pilot &#8594;</a>
+      </div>
+      <div class="price-card">
+        <h3>Enterprise</h3>
+        <p class="price-desc">Fully custom. Built for brands that want it all.</p>
+        <div class="price-amount">$3K+<span>/mo</span></div>
+        <p class="price-period">Custom scope</p>
+        <ul class="price-features">
+          <li>Everything in Growth</li>
+          <li>Voice cloning (sound like you)</li>
+          <li>Reactive tone (voice adapts to live events)</li>
+          <li>Host takeover mode (go live yourself anytime)</li>
+          <li>Custom commands &amp; data integrations</li>
+          <li>Multi-platform (3+ simultaneous)</li>
+          <li>Custom overlays &amp; branded transitions</li>
+          <li>Dedicated server (not shared)</li>
+          <li>Dedicated account manager</li>
+        </ul>
+        <a href="/configure.html" class="btn btn-secondary">Build Your Stream &#8594;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- URGENCY BANNER -->
+<div class="urgency-banner">
+  <div class="urgency-label">&#128293; FOUNDING CLIENT PROGRAM</div>
+  <div class="urgency-title">Free 2-week pilot. Then $999/mo &mdash; locked in forever.</div>
+  <div style="margin: 1rem 0;">
+    <span class="spots-count">Only 3 spots remaining</span>
+  </div>
+  <div class="urgency-sub">We're onboarding 10 founding clients at locked-in rates with White Glove attention. 7 spots are taken. Once we're full, this offer disappears and pricing increases.</div>
+</div>
+
+<!-- CTA -->
+<section class="cta-section" id="contact">
+  <h2>Ready to stream <span class="gradient">24/7</span>?</h2>
+  <p>Your AI host is waiting. Launch in under 48 hours.</p>
+  <div class="cta-buttons">
+    <a href="mailto:Kyle@PilotCast.ai?subject=PilotCast%20&mdash;%20Free%20Pilot" class="btn btn-urgent">Start Your Free Pilot &#8594; Kyle@PilotCast.ai</a>
+    <a href="/configure.html" class="btn btn-secondary">Build Your Stream &#8594;</a>
+  </div>
+  <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 1.5rem;">No credit card required. Free 2-week pilot, cancel anytime.</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>&copy; 2026 PilotCast AI &mdash; A product of <a href="https://apromptpc.com">A Prompt PC</a> | <a href="mailto:Kyle@PilotCast.ai">Kyle@PilotCast.ai</a></p>
+</footer>
+
+<script>
+// ROI Calculator
+const viewers = document.getElementById('viewers');
+const cpm = document.getElementById('cpm');
+const sponsors = document.getElementById('sponsors');
+
+function updateROI() {
+  const v = parseInt(viewers.value);
+  const c = parseInt(cpm.value);
+  const s = parseInt(sponsors.value);
+
+  document.getElementById('viewers-val').textContent = v.toLocaleString();
+  document.getElementById('cpm-val').textContent = '$' + c;
+  document.getElementById('sponsors-val').textContent = s;
+
+  // 24/7 = ~720 hours/mo
+  // Ad revenue: concurrent viewers * hours * CPM / 1000
+  const adRevenue = (v * 720 * c) / 1000;
+  // Sponsor revenue: mentions/day * $75 avg per mention * 30 days
+  const sponsorRevenue = s * 75 * 30;
+  const total = Math.round(adRevenue + sponsorRevenue);
+
+  document.getElementById('roi-total').textContent = '$' + total.toLocaleString();
+
+  // Show ROI vs cost
+  const cost = 999;
+  const roi = Math.round((total / cost) * 100);
+  const vsEl = document.getElementById('roi-vs');
+  if (total > cost) {
+    vsEl.textContent = "That's " + roi + "% return on a $999/mo investment.";
+    vsEl.style.color = '#22c55e';
+  } else if (total > 0) {
+    vsEl.textContent = 'Growing — scale viewers to increase your return.';
+    vsEl.style.color = '#f59e0b';
+  } else {
+    vsEl.textContent = 'Adjust sliders to see your potential revenue.';
+    vsEl.style.color = '#7a82a0';
+  }
+}
+
+if (viewers && cpm && sponsors) {
+  viewers.addEventListener('input', updateROI);
+  cpm.addEventListener('input', updateROI);
+  sponsors.addEventListener('input', updateROI);
+  updateROI();
+}
+</script>
+</body>
+</html>
