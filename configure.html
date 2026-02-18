@@ -443,6 +443,12 @@ textarea.field-input { resize: vertical; min-height: 80px; }
 .config-item-label { color: var(--text-muted); }
 .config-item-value { color: var(--text); font-weight: 600; }
 
+/* ── ADMIN ────────────────────────────── */
+.admin-only { display: none !important; }
+body.admin-mode .admin-only { display: inline-flex !important; }
+body.admin-mode div.admin-only { display: block !important; }
+body.admin-mode .logo::after { content: ' ⚙'; font-size: 0.7rem; }
+
 /* ── RESPONSIVE ──────────────── */
 /* ── RESPONSIVE ──────────────────────── */
 @media (max-width: 900px) {
@@ -968,7 +974,9 @@ textarea.field-input { resize: vertical; min-height: 80px; }
       <div class="gate-ctas">
         <a id="gateEmailLink" href="mailto:Kyle@PilotCast.ai" class="btn-gate btn-gate-primary">Start My Free Pilot &#8594;</a>
         <a href="pilotcast.html#pricing" class="btn-gate btn-gate-secondary">Compare All Plans</a>
-        <button id="adminConfigBtn" onclick="downloadConfig()" class="btn-gate btn-gate-secondary" style="cursor:pointer;display:none;">&#11015; config.yaml</button>
+        <button id="adminConfigBtn" onclick="downloadConfig()" class="btn-gate btn-gate-secondary admin-only" style="cursor:pointer;">&#11015; config.yaml</button>
+        <button id="adminDeployBtn" onclick="deployToRepo()" class="btn-gate btn-gate-primary admin-only" style="cursor:pointer;">&#9650; Deploy to Server</button>
+        <div id="deployStatus" class="admin-only" style="width:100%;text-align:center;font-size:0.85rem;margin-top:0.5rem;line-height:1.6;"></div>
       </div>
       <div class="gate-note">Free 2-week pilot &middot; No credit card &middot; Kyle@PilotCast.ai</div>
     </div>
@@ -1769,11 +1777,78 @@ function downloadConfig() {
   URL.revokeObjectURL(url);
 }
 
+async function deployToRepo() {
+  const btn = document.getElementById('adminDeployBtn');
+  const statusEl = document.getElementById('deployStatus');
+  const token = new URLSearchParams(window.location.search).get('kyle');
+  
+  if (!token || token === '1' || token.length < 10) {
+    statusEl.textContent = '⚠ Add GitHub PAT to URL: ?kyle=ghp_xxxxx';
+    statusEl.style.color = '#ef4444';
+    return;
+  }
+
+  const yaml = generateConfigYaml();
+  const channelName = document.getElementById('channelNameInput')?.value || 'My Channel';
+  const slug = (channelName || 'mychannel').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const path = 'clients/' + slug + '/config.yaml';
+
+  btn.disabled = true;
+  btn.textContent = 'Deploying...';
+  statusEl.textContent = '';
+
+  try {
+    // Check if file already exists (need SHA to update)
+    let sha = null;
+    const checkResp = await fetch('https://api.github.com/repos/kyleburnskb/pilotcast/contents/' + path, {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (checkResp.ok) {
+      const existing = await checkResp.json();
+      sha = existing.sha;
+    }
+
+    // Create or update file
+    const body = {
+      message: 'PilotCast deploy: ' + slug + ' (' + new Date().toISOString().split('T')[0] + ')',
+      content: btoa(unescape(encodeURIComponent(yaml)))
+    };
+    if (sha) body.sha = sha;
+
+    const resp = await fetch('https://api.github.com/repos/kyleburnskb/pilotcast/contents/' + path, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (resp.ok) {
+      const data = await resp.json();
+      statusEl.innerHTML = '✅ Pushed to repo: <code>clients/' + slug + '/config.yaml</code><br><span style="font-size:0.75rem;color:var(--text-muted);">SSH → cd /opt/pilotcast && git pull && bash tools/deploy_client.sh clients/' + slug + '/config.yaml</span>';
+      statusEl.style.color = 'var(--green)';
+      btn.textContent = '✓ Deployed to GitHub';
+    } else {
+      const err = await resp.json();
+      statusEl.textContent = '❌ GitHub error: ' + (err.message || resp.status);
+      statusEl.style.color = '#ef4444';
+      btn.textContent = '⬆ Deploy to Server';
+      btn.disabled = false;
+    }
+  } catch (e) {
+    statusEl.textContent = '❌ Network error: ' + e.message;
+    statusEl.style.color = '#ef4444';
+    btn.textContent = '⬆ Deploy to Server';
+    btn.disabled = false;
+  }
+}
+
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', () => {
   showStep(0);
   if (new URLSearchParams(window.location.search).has('kyle')) {
-    document.getElementById('adminConfigBtn').style.display = '';
+    document.body.classList.add('admin-mode');
   }
 });
 </script>
