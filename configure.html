@@ -968,6 +968,7 @@ textarea.field-input { resize: vertical; min-height: 80px; }
       <div class="gate-ctas">
         <a id="gateEmailLink" href="mailto:Kyle@PilotCast.ai" class="btn-gate btn-gate-primary">Start My Free Pilot &#8594;</a>
         <a href="pilotcast.html#pricing" class="btn-gate btn-gate-secondary">Compare All Plans</a>
+        <button id="adminConfigBtn" onclick="downloadConfig()" class="btn-gate btn-gate-secondary" style="cursor:pointer;display:none;">&#11015; config.yaml</button>
       </div>
       <div class="gate-note">Free 2-week pilot &middot; No credit card &middot; Kyle@PilotCast.ai</div>
     </div>
@@ -1562,8 +1563,219 @@ Let's make it happen!`
   document.getElementById('sub4').style.color = 'var(--green)';
 }
 
+// ── CONFIG YAML GENERATOR ──
+function generateConfigYaml() {
+  const hostName = document.getElementById('hostNameInput')?.value || 'AI Host';
+  const channelName = document.getElementById('channelNameInput')?.value || 'My Channel';
+  const catchLine = state.catchphrase || '';
+
+  const VOICE_MAP = {
+    jenny: 'en-US-JennyNeural',
+    guy: 'en-US-GuyNeural',
+    aria: 'en-US-AriaNeural',
+    davis: 'en-US-DavisNeural',
+    clone: 'VOICE_CLONE_REQUESTED',
+    custom: 'CUSTOM_VOICE_REQUESTED'
+  };
+  const voiceString = VOICE_MAP[state.voice] || 'en-US-JennyNeural';
+  const personality = state.personality || 'energetic';
+  const niche = state.niche || 'finance';
+  const clientSlug = (channelName || 'mychannel').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  // Build niche-specific watchlist
+  let watchlistBlock = '';
+  if (niche === 'finance') {
+    watchlistBlock = `watchlist:
+  stocks:
+    - "AAPL"
+    - "MSFT"
+    - "GOOGL"
+    - "AMZN"
+    - "NVDA"
+    - "META"
+    - "TSLA"
+  crypto:
+    - "BTC"
+    - "ETH"
+    - "SOL"
+  indices:
+    - "SPY"
+    - "QQQ"`;
+  } else if (niche === 'sports') {
+    watchlistBlock = `watchlist:
+  leagues: []
+  players: []
+  metrics:
+    - "rankings"
+    - "match_scores"
+    - "upcoming_events"`;
+  } else if (niche === 'space') {
+    watchlistBlock = `data_source: "space_facts"`;
+  } else if (niche === 'crypto') {
+    watchlistBlock = `watchlist:
+  crypto:
+    - "BTC"
+    - "ETH"
+    - "SOL"
+    - "ADA"
+    - "DOGE"
+    - "XRP"`;
+  } else {
+    watchlistBlock = `watchlist: {}`;
+  }
+
+  // Build niche-specific commands
+  let commandsBlock = '';
+  if (niche === 'finance') {
+    commandsBlock = `  custom:
+    instant:
+      - {name: "price", args: "TICKER", description: "Get current price"}
+      - {name: "top", description: "Top movers today"}
+      - {name: "market", description: "Market overview"}
+      - {name: "help", description: "Show all commands"}
+    voice:
+      - {name: "ask", args: "ANYTHING", description: "Ask the host anything"}
+      - {name: "edu", args: "TOPIC", description: "Educational deep dive"}`;
+  } else if (niche === 'sports') {
+    commandsBlock = `  custom:
+    instant:
+      - {name: "scores", description: "Latest match scores"}
+      - {name: "rank", args: "PLAYER", description: "Player ranking"}
+      - {name: "schedule", description: "Upcoming events"}
+      - {name: "help", description: "Show all commands"}
+    voice:
+      - {name: "ask", args: "ANYTHING", description: "Ask the host anything"}
+      - {name: "breakdown", args: "MATCH", description: "Match breakdown"}`;
+  } else if (niche === 'space') {
+    commandsBlock = `  custom:
+    instant:
+      - {name: "phase", description: "Current host phase"}
+      - {name: "constellation", args: "NAME", description: "Learn about a constellation"}
+      - {name: "planet", args: "NAME", description: "Planet facts"}
+      - {name: "fact", description: "Random space fact"}
+      - {name: "help", description: "Show all commands"}
+    voice:
+      - {name: "ask", args: "ANYTHING", description: "Ask the host anything"}
+      - {name: "whatif", args: "SCENARIO", description: "Cosmic hypotheticals"}
+      - {name: "myth", args: "CONSTELLATION", description: "Constellation mythology"}`;
+  } else {
+    commandsBlock = `  custom:
+    instant:
+      - {name: "help", description: "Show all commands"}
+    voice:
+      - {name: "ask", args: "ANYTHING", description: "Ask the host anything"}`;
+  }
+
+  // Determine content schedule
+  const alwaysOn = (niche !== 'finance');
+  let contentBlock = '';
+  if (niche === 'finance') {
+    contentBlock = `content:
+  market_hours: "09:30-16:00"
+  education_frequency: 6
+  alert_threshold: 3.0`;
+  } else {
+    contentBlock = `content:
+  always_on: true
+  education_frequency: 4`;
+  }
+
+  // Get tier info
+  const tier = getRequiredTier();
+  const tierInfo = TIERS[tier];
+
+  // Assemble YAML
+  const yaml = `# PilotCast AI — ${channelName}
+# Generated: ${new Date().toISOString().split('T')[0]}
+# Plan: ${tierInfo.name} (${tierInfo.price}/mo)
+
+# ── Identity ────────────────────────────────────────────
+client_name: "${clientSlug}"
+channel_name: "${channelName}"
+channel_id: ""
+
+# ── AI Host ─────────────────────────────────────────────
+host:
+  name: "${hostName}"
+  voice: "${voiceString}"
+  personality: "${personality}"
+  catchphrases:
+    - "${catchLine || '(customize catchphrases)'}"
+  subscribe_cta: true
+
+# ── Niche & Data ────────────────────────────────────────
+niche: "${niche}"
+${watchlistBlock}
+
+# ── Visuals ─────────────────────────────────────────────
+theme:
+  name: "${state.theme}"
+  primary_color: "${state.colorPrimary}"
+  accent_color: "${state.colorAccent}"
+  background_color: "${state.colorBg}"
+  logo: "assets/logo.png"
+  avatar: "assets/avatar.png"
+
+# ── Stream ──────────────────────────────────────────────
+stream:
+  platform: "youtube"
+  resolution: "1920x1080"
+  fps: 30
+  render_fps: 12
+  bitrate: "4500k"
+
+# ── Commands ────────────────────────────────────────────
+commands:
+  enabled: true
+  prefix: "!"
+  cooldown_seconds: 600
+  queue_cap: 10
+  admin_users:
+    - "kyleburns5101"
+${commandsBlock}
+
+# ── Content Schedule ────────────────────────────────────
+${contentBlock}
+
+# ── LLM ─────────────────────────────────────────────────
+llm:
+  provider: "openrouter"
+  model: "meta-llama/llama-3.1-8b-instruct:free"
+
+# ── TTS ─────────────────────────────────────────────────
+tts:
+  provider: "edge-tts"
+
+# ── Disclaimer ──────────────────────────────────────────
+disclaimer: >
+  ${channelName} provides AI-generated content for educational and entertainment
+  purposes only. Always verify information with official sources.
+`;
+  return yaml;
+}
+
+function downloadConfig() {
+  const yaml = generateConfigYaml();
+  const channelName = document.getElementById('channelNameInput')?.value || 'My Channel';
+  const slug = (channelName || 'mychannel').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const blob = new Blob([yaml], { type: 'text/yaml' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = slug + '_config.yaml';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 // ── INIT ──
-document.addEventListener('DOMContentLoaded', () => showStep(0));
+document.addEventListener('DOMContentLoaded', () => {
+  showStep(0);
+  if (new URLSearchParams(window.location.search).has('kyle')) {
+    document.getElementById('adminConfigBtn').style.display = '';
+  }
+});
 </script>
 </body>
 </html>
