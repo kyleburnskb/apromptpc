@@ -400,14 +400,76 @@
       font-size: 1.1rem;
       border-top: 1px solid rgba(96,165,250,0.15);
     }
+    /* ── RESPONSIVE ──────────────────────── */
     @media (max-width: 1023px) {
-      .grid { grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+      .grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
     }
     @media (max-width: 768px) {
-      h1 { font-size: 3.2rem; }
-      .cta-btn { font-size: 1.4rem; padding: 16px 40px; }
-      .values-grid { flex-direction: column; align-items: center; }
-      .value-card { width: 100%; max-width: 500px; }
+      /* Nav */
+      nav { flex-direction: column; gap: 12px; padding: 12px 16px; }
+      nav ul { flex-wrap: wrap; gap: 12px; justify-content: center; }
+      nav a { font-size: 0.9rem; }
+      .nav-cta { padding: 8px 20px; font-size: 0.9rem; }
+
+      /* Hero */
+      header { padding: 120px 16px 40px; }
+      h1 { font-size: 2.4rem; }
+      .location { font-size: 1.2rem; margin-bottom: 24px; }
+      .cta-btn { font-size: 1.1rem; padding: 14px 32px; }
+
+      /* Sections */
+      .services-section, .savings-section { padding: 50px 12px 80px; }
+      h2 { font-size: 2.2rem; margin-bottom: 24px; }
+
+      /* Grid cards */
+      .grid { grid-template-columns: 1fr; gap: 50px; max-width: 400px; }
+      .card { max-width: 100%; }
+      .card-header { padding: 70px 20px 24px; min-height: 180px; }
+      .card-header i { width: 100px; height: 100px; line-height: 100px; font-size: 3.8rem; top: -55px; }
+      .card-title { font-size: 1.5rem; margin: 16px 0 0; }
+      .card-body { padding: 0 20px 28px; }
+      li { font-size: 1rem; padding-left: 28px; margin-bottom: 12px; }
+      li::before { font-size: 1.2rem; }
+
+      /* Services 4-card grid */
+      .services-section .grid { grid-template-columns: 1fr 1fr; max-width: 600px; margin: 0 auto; }
+
+      /* Pricing */
+      .pricing-section { padding: 60px 16px; }
+      .pricing-card { padding: 36px 24px; }
+      .pricing-tagline { font-size: 1.4rem; }
+      .pricing-highlight { font-size: 2.8rem; }
+      .pricing-subtitle { font-size: 1.2rem; }
+
+      /* Values */
+      .values-section { padding: 60px 16px; }
+      .values-title { font-size: 2.4rem; margin-bottom: 24px; }
+      .underline { width: 200px; margin-bottom: 40px; }
+      .values-grid { flex-direction: column; align-items: center; gap: 24px; }
+      .value-card { width: 100%; max-width: 500px; padding: 28px; }
+      .value-card h3 { font-size: 1.5rem; }
+
+      /* Contact */
+      .contact-section { padding: 60px 16px; }
+      .contact-card { padding: 36px 20px; }
+      .contact-title { font-size: 2.2rem; margin-bottom: 20px; }
+      .contact-text { font-size: 1.2rem; margin-bottom: 24px; }
+
+      /* Footer */
+      footer { padding: 40px 16px 24px; font-size: 0.9rem; }
+    }
+    @media (max-width: 480px) {
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.8rem; }
+      .grid { gap: 40px; }
+      .services-section .grid { grid-template-columns: 1fr; max-width: 320px; }
+      .card-header { padding: 60px 16px 20px; min-height: 150px; }
+      .card-header i { width: 80px; height: 80px; line-height: 80px; font-size: 3rem; top: -45px; }
+      .card-title { font-size: 1.3rem; }
+      .pricing-highlight { font-size: 2.2rem; }
+      .values-title { font-size: 2rem; }
+      .contact-title { font-size: 1.8rem; }
+      .value-card { padding: 20px; }
     }
   </style>
 </head>
@@ -445,7 +507,7 @@
       Eliminate Wasteful Redundancy. Strengthen Strategic Resilience.
     </p>
     <p style="text-align:center; font-size:1.6rem; color:#94a3b8; margin-bottom:80px;">
-      Optimize Your IT Budget • Real Results, No Fluff
+      Optimize Your IT Budget â€¢ Real Results, No Fluff
     </p>
 
     <div class="grid">
@@ -644,10 +706,9 @@
   </section>
 
   <footer>
-    <p>© 2026 A Prompt PC • Atlanta, GA • All rights reserved</p>
+    <p>Â© 2026 A Prompt PC â€¢ Atlanta, GA â€¢ All rights reserved</p>
   </footer>
 
 </body>
 </html>
-
 
