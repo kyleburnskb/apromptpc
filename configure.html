@@ -1535,14 +1535,52 @@ function renderPreview() {
   const selectedAddons = reasons.map(r => '  - ' + r.label).join('\n') || '  (none)';
 
   const subject = encodeURIComponent(`PilotCast — ${channelName || 'New Stream'} (${tierInfo.name})`);
-  const configBlock = generateConfigYaml();
+  // Minimal YAML that fits mailto limits (~1500 chars max encoded)
+  const minYaml = `client_name: "${(channelName || 'mychannel').toLowerCase().replace(/[^a-z0-9]/g, '')}"
+channel_name: "${channelName || '(TBD)'}"
+host:
+  name: "${hostName}"
+  voice: "${voiceString}"
+  personality: "${personalityLabel.toLowerCase()}"
+  catchphrases:
+    - "${catchLine || '(customize)'}"
+  subscribe_cta: true
+niche: "${nicheLabel.toLowerCase()}"
+theme:
+  name: "${state.theme}"
+  primary_color: "${state.colorPrimary}"
+  accent_color: "${state.colorAccent}"
+  background_color: "${state.colorBg}"
+  logo: "assets/logo.png"
+  avatar: "assets/avatar.png"
+stream:
+  platform: "youtube"
+  resolution: "1920x1080"
+  fps: 30
+  render_fps: 12
+  bitrate: "4500k"
+commands:
+  enabled: true
+  prefix: "!"
+  cooldown_seconds: 600
+  queue_cap: 10
+  admin_users:
+    - "kyleburns5101"
+llm:
+  provider: "openrouter"
+  model: "meta-llama/llama-3.1-8b-instruct:free"
+tts:
+  provider: "edge-tts"
+disclaimer: >
+  ${channelName || 'This channel'} provides AI-generated content for
+  educational and entertainment purposes only.`;
+
   const body = encodeURIComponent(
-`New PilotCast signup: ${channelName || 'New Stream'}
-Plan: ${tierInfo.name} (${tierInfo.price}/mo)
+`Plan: ${tierInfo.name} (${tierInfo.price}/mo)
 
-Copy everything below this line into the paste box at configure.html?kyle
+Paste everything below into: bash /opt/pilotcast/tools/onboard.sh
 
-${configBlock}`
+${minYaml}`
   );
   document.getElementById('gateEmailLink').href = `mailto:Kyle@PilotCast.ai?subject=${subject}&body=${body}`;
 
