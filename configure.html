@@ -972,7 +972,8 @@ body.admin-mode .logo::after { content: ' ⚙'; font-size: 0.7rem; }
       <div class="config-summary" id="configSummary"></div>
 
       <div class="gate-ctas">
-        <a id="gateEmailLink" href="mailto:Kyle@PilotCast.ai" class="btn-gate btn-gate-primary">Start My Free Pilot &#8594;</a>
+        <button id="gateSubmitBtn" onclick="submitConfig()" class="btn-gate btn-gate-primary" style="cursor:pointer;">Start My Free Pilot &#8594;</button>
+        <div id="submitStatus" style="display:none;margin-top:0.8rem;text-align:center;font-size:0.95rem;line-height:1.6;"></div>
         <a href="pilotcast.html#pricing" class="btn-gate btn-gate-secondary">Compare All Plans</a>
         <button id="adminConfigBtn" onclick="downloadConfig()" class="btn-gate btn-gate-secondary admin-only" style="cursor:pointer;">&#11015; config.yaml (backup)</button>
       </div>
@@ -1534,55 +1535,8 @@ function renderPreview() {
   const catchLine = state.catchphrase || '(Kyle will create catchphrases)';
   const selectedAddons = reasons.map(r => '  - ' + r.label).join('\n') || '  (none)';
 
-  const subject = encodeURIComponent(`PilotCast — ${channelName || 'New Stream'} (${tierInfo.name})`);
-  // Minimal YAML that fits mailto limits (~1500 chars max encoded)
-  const minYaml = `client_name: "${(channelName || 'mychannel').toLowerCase().replace(/[^a-z0-9]/g, '')}"
-channel_name: "${channelName || '(TBD)'}"
-host:
-  name: "${hostName}"
-  voice: "${voiceString}"
-  personality: "${personalityLabel.toLowerCase()}"
-  catchphrases:
-    - "${catchLine || '(customize)'}"
-  subscribe_cta: true
-niche: "${nicheLabel.toLowerCase()}"
-theme:
-  name: "${state.theme}"
-  primary_color: "${state.colorPrimary}"
-  accent_color: "${state.colorAccent}"
-  background_color: "${state.colorBg}"
-  logo: "assets/logo.png"
-  avatar: "assets/avatar.png"
-stream:
-  platform: "youtube"
-  resolution: "1920x1080"
-  fps: 30
-  render_fps: 12
-  bitrate: "4500k"
-commands:
-  enabled: true
-  prefix: "!"
-  cooldown_seconds: 600
-  queue_cap: 10
-  admin_users:
-    - "kyleburns5101"
-llm:
-  provider: "openrouter"
-  model: "meta-llama/llama-3.1-8b-instruct:free"
-tts:
-  provider: "edge-tts"
-disclaimer: >
-  ${channelName || 'This channel'} provides AI-generated content for
-  educational and entertainment purposes only.`;
-
-  const body = encodeURIComponent(
-`Plan: ${tierInfo.name} (${tierInfo.price}/mo)
-
-Paste everything below into: bash /opt/pilotcast/tools/onboard.sh
-
-${minYaml}`
-  );
-  document.getElementById('gateEmailLink').href = `mailto:Kyle@PilotCast.ai?subject=${subject}&body=${body}`;
+  // Store config for submit
+  window._lastConfig = generateConfigYaml();
 
   document.getElementById('sub4').textContent = tierInfo.name + ' — ' + tierInfo.price + '/mo';
   document.getElementById('sub4').style.color = 'var(--green)';
@@ -1777,6 +1731,47 @@ disclaimer: >
   purposes only. Always verify information with official sources.
 `;
   return yaml;
+}
+
+async function submitConfig() {
+  const btn = document.getElementById('gateSubmitBtn');
+  const statusEl = document.getElementById('submitStatus');
+  const yaml = window._lastConfig || generateConfigYaml();
+  const channelName = document.getElementById('channelNameInput')?.value || 'New Stream';
+
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  // FORMSPREE_ID: Replace with your Formspree form ID
+  // Create one free at formspree.io → Forms → New Form → copy the ID
+  const FORMSPREE_ID = 'xaqdbydq';
+
+  try {
+    const resp = await fetch('https://formspree.io/f/' + FORMSPREE_ID, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject: 'PilotCast — ' + channelName + ' — New Signup',
+        channel: channelName,
+        config: yaml
+      })
+    });
+
+    if (resp.ok) {
+      btn.textContent = '✓ Submitted!';
+      btn.style.background = 'var(--green)';
+      statusEl.style.display = 'block';
+      statusEl.style.color = 'var(--green)';
+      statusEl.innerHTML = '&#127881; We got your config! Kyle will reach out within 24 hours to get you live.';
+    } else {
+      throw new Error('Submit failed');
+    }
+  } catch (e) {
+    // Fallback: mailto with short message
+    btn.textContent = 'Start My Free Pilot &#8594;';
+    btn.disabled = false;
+    window.location.href = 'mailto:Kyle@PilotCast.ai?subject=' + encodeURIComponent('PilotCast — ' + channelName) + '&body=' + encodeURIComponent('Hi Kyle, I just configured my stream on PilotCast. Channel: ' + channelName + '. Looking forward to going live!');
+  }
 }
 
 function downloadConfig() {
